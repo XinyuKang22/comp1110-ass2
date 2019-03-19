@@ -8,8 +8,6 @@ Members: Xinyu Kang      Elton Li      Yinuo Zhang
 Uids:    u6120911        u6662643      u6598700
 Weekly Meeting Time: Sat 1pm
 
-Everyone: create application skeleton - meeting 14:00 17 Aug
-
 ## Week 5
 
 Zhang San: Task 3 isPiecePlacementWellFormed - 21 Aug
