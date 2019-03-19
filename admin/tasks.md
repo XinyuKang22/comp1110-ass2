@@ -4,6 +4,9 @@ For each task or sub-task, record who is responsible, the deadline, and any depe
 Use the entries below as an example.
 
 ## Week 4
+Members: Xinyu Kang      Elton Li      Yinuo Zhang
+Uids:    u6120911        u6662643      u6598700
+Weekly Meeting Time: Sat 1pm
 
 Everyone: create application skeleton - meeting 14:00 17 Aug
 
