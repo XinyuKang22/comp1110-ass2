@@ -34,7 +34,7 @@ public class IsBoardStringWellFormedTest {
     public void testIncomplete() {
         testTrivialCorrect();
         String incomplete = SampleGames.COMPLETED_GAMES[0].substring(0, 23);
-        assertFalse("Board string '" + incomplete + "'was incomplete, but passed", RailroadInk.isBoardStringWellFormed(incomplete));
+        assertFalse( "Board string '"+ incomplete + "'was incomplete, but passed", RailroadInk.isBoardStringWellFormed(incomplete));
     }
 
     @Test
