@@ -46,7 +46,32 @@ public class RailroadInk {
      */
     public static boolean areConnectedNeighbours(String tilePlacementStringA, String tilePlacementStringB) {
         // FIXME Task 5: determine whether neighbouring placements are connected
-        return false;
+        char[] a = tilePlacementStringA.toCharArray();
+        char[] b = tilePlacementStringB.toCharArray();
+        char[] i = {'A','B','C','D','E','F','G'};
+        char[] n = {'0','1','2','3','4','5','6'};
+        if(a[2]==b[2] && (a[3]!= '0')&& (a[3]!= '6')) {
+            if ((b[3] != n[(find(n, a[3]) + 1)]) && (b[3] != n[(find(n, a[3]) - 1)])) { return false; }
+        }
+        else if(a[2]==b[2] && (a[3]== '0')) {
+            if (b[3] != n[(find(n, a[3]) + 1)]) { return false; }
+        }
+        else if(a[2]==b[2] && (a[3]== '6')) {
+            if (b[3] != n[(find(n, a[3]) - 1)]) { return false; }
+        }
+        else if(a[3]==b[3]&& (a[2]!= 'A')&& (a[2]!= 'G')){
+            if((b[2]!=i[(find(i,a[2])+1)]) && (b[2]!=i[(find(i,a[2])-1)])) { return false;}
+            }
+        else if (a[3]==b[3] && (a[2]== 'A')) {
+            if (b[2] != i[(find(i, a[2]) + 1)]) { return false; }
+        }
+        else if (a[3]==b[3] && (a[2]== 'G')) {
+            if (b[2] != i[(find(i, a[2]) - 1)]) { return false; }
+        }
+
+        else if ((a[2]!=b[2])&&(a[3]!=b[3])){return false; }
+
+        return true;
     }
 
     /**
@@ -128,5 +153,22 @@ public class RailroadInk {
         // FIXME Task 12: compute the total score including bonus points
         return -1;
     }
+
+    public static void main(String[] args) {
+        System.out.println(areConnectedNeighbours("A3B21","A3B41"));
+    }
+
+    /*
+    Generic function to find the index of an element in a char array in Java
+     */
+    public static int find(char[] a, char target)
+    {
+        for (int i = 0; i < a.length; i++)
+            if (target == (a[i]))
+                return i;
+        return -1;
+    }
+
 }
+
 
