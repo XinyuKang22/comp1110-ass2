@@ -1,5 +1,7 @@
 package comp1110.ass2;
 
+import comp1110.ass2.gui.Board;
+
 public class RailroadInk {
     /**
      * Determine whether a tile placement string is well-formed:
@@ -45,52 +47,34 @@ public class RailroadInk {
      * @return true if the placements are connected neighbours
      */
     public static boolean areConnectedNeighbours(String tilePlacementStringA, String tilePlacementStringB) {
-        char[] a = tilePlacementStringA.toCharArray();
-        char[] b = tilePlacementStringB.toCharArray();
-        int c = findPosition(tilePlacementStringA, tilePlacementStringB);
-        int d = findPosition1(c);
-        String[][] A = {{"RNNR", "RRNN", "NRRN", "NNRR", "RRNN", "NRRN", "NNRR", "RNNR"}, {"RNRN", "NRNR", "RNRN", "NRNR", "RNRN", "NRNR", "RNRN", "NRNR"},
-                {"RRRN", "NRRR", "RNRR", "RRNR", "RNRR", "RRNR", "RRRN", "NRRR"}, {"HHHN", "NHHH", "HNHH", "HHNH", "HNHH", "HHNH", "HHHN", "NHHH"},
-                {"HNHN", "NHNH", "HNHN", "NHNH", "HNHN", "NHNH", "HNHN", "NHNH"}, {"HNNH", "HHNN", "NHHN", "NNHH", "HHNN", "NHHN", "NNHH", "HNNH"}};
 
-        String[][] B = {{"HNRN", "NHNR", "RNHN", "NRNH", "HNRN", "NHNR", "RNHN", "NRNH"},
-                {"HRNN", "NHRN", "NNHR", "RNNH", "HNNR", "RHNN", "NRHN", "NNRH"},
-                {"HRHR", "RHRH", "HRHR", "RHRH", "HRHR", "RHRH", "HRHR", "RHRH"}};
+        if(!Board.areNeighbors(tilePlacementStringA,tilePlacementStringB)){
+            return false;
+        }
 
-        String[][] S = {{"HHRH","HHHR","RHHH","HRHH","HHRH","HHHR","RHHH","HRHH"},{"HRRR","RHRR","RRHR","RRRH","HRRR","RHRR","RRHR","RRRH"},
-                {"HHHH", "HHHH", "HHHH", "HHHH", "HHHH", "HHHH", "HHHH", "HHHH"}, {"RRRR","RRRR","RRRR","RRRR","RRRR","RRRR","RRRR","RRRR" },
-                {"HRRH","HHRR","RHHR","RRHH","HHRR","RHHR","RRHH","HRRH"},{"HRHR", "RHRH", "HRHR", "RHRH", "HRHR", "RHRH", "HRHR", "RHRH"}};
+        String[] infoA = Board.rotatedTileInfo(tilePlacementStringA);
+        String[] infoB = Board.rotatedTileInfo(tilePlacementStringB);
 
-        if (areNeighbours(tilePlacementStringA, tilePlacementStringB)) {
-            if (a[0] == 'A' && b[0] == 'A') { if (A[Character.getNumericValue(a[1])][Character.getNumericValue(a[4])].charAt(c) == 'N' || A[Character.getNumericValue(b[1])][Character.getNumericValue(b[4])].charAt(d) == 'N'){
-                return false;} else return A[Character.getNumericValue(a[1])][Character.getNumericValue(a[4])].charAt(c) == A[Character.getNumericValue(b[1])][Character.getNumericValue(b[4])].charAt(d) ; }
+        int B_relativeTo_A = Board.relativePosition(tilePlacementStringA,tilePlacementStringB);
 
-            else if (a[0] == 'A' && b[0] == 'B') { if (A[Character.getNumericValue(a[1])][Character.getNumericValue(a[4])].charAt(c) == 'N' || B[Character.getNumericValue(b[1])][Character.getNumericValue(b[4])].charAt(d) == 'N'){
-                return false;} else return A[Character.getNumericValue(a[1])][Character.getNumericValue(a[4])].charAt(c) == B[Character.getNumericValue(b[1])][Character.getNumericValue(b[4])].charAt(d) ; }
+        if(B_relativeTo_A==0){
+            return infoB[2].equals(infoA[0]) && !infoA[0].equals("Nothing");
 
-            else if (a[0] == 'A' && b[0] == 'S') { if (A[Character.getNumericValue(a[1])][Character.getNumericValue(a[4])].charAt(c) == 'N' || S[Character.getNumericValue(b[1])][Character.getNumericValue(b[4])].charAt(d) == 'N'){
-                return false;} else return A[Character.getNumericValue(a[1])][Character.getNumericValue(a[4])].charAt(c) == S[Character.getNumericValue(b[1])][Character.getNumericValue(b[4])].charAt(d) ; }
+        }else if (B_relativeTo_A==1){
+            return infoB[3].equals(infoA[1]) && !infoA[1].equals("Nothing");
 
-            else if (a[0] == 'B' && b[0] == 'B') { if (B[Character.getNumericValue(a[1])][Character.getNumericValue(a[4])].charAt(c) == 'N' || B[Character.getNumericValue(b[1])][Character.getNumericValue(b[4])].charAt(d) == 'N'){
-                return false;} else return B[Character.getNumericValue(a[1])][Character.getNumericValue(a[4])].charAt(c) == B[Character.getNumericValue(b[1])][Character.getNumericValue(b[4])].charAt(d) ; }
+        }else if (B_relativeTo_A==2){
+            return infoB[0].equals(infoA[2]) && !infoA[2].equals("Nothing");
 
-            else if (a[0] == 'B' && b[0] == 'A') { if (B[Character.getNumericValue(a[1])][Character.getNumericValue(a[4])].charAt(c) == 'N' || A[Character.getNumericValue(b[1])][Character.getNumericValue(b[4])].charAt(d) == 'N'){
-                return false;} else return B[Character.getNumericValue(a[1])][Character.getNumericValue(a[4])].charAt(c) == A[Character.getNumericValue(b[1])][Character.getNumericValue(b[4])].charAt(d) ; }
+        }else if (B_relativeTo_A==3){
+            return infoB[1].equals(infoA[3]) && !infoA[3].equals("Nothing");
 
-            else if (a[0] == 'B' && b[0] == 'S') { if (B[Character.getNumericValue(a[1])][Character.getNumericValue(a[4])].charAt(c) == 'N' || S[Character.getNumericValue(b[1])][Character.getNumericValue(b[4])].charAt(d) == 'N'){
-                return false;} else return B[Character.getNumericValue(a[1])][Character.getNumericValue(a[4])].charAt(c) == S[Character.getNumericValue(b[1])][Character.getNumericValue(b[4])].charAt(d) ; }
-
-            else if (a[0] == 'S' && b[0] == 'S') { if (S[Character.getNumericValue(a[1])][Character.getNumericValue(a[4])].charAt(c) == 'N' || S[Character.getNumericValue(b[1])][Character.getNumericValue(b[4])].charAt(d) == 'N'){
-                return false;} else return S[Character.getNumericValue(a[1])][Character.getNumericValue(a[4])].charAt(c) == S[Character.getNumericValue(b[1])][Character.getNumericValue(b[4])].charAt(d) ; }
-
-            else if (a[0] == 'S' && b[0] == 'A') { if (S[Character.getNumericValue(a[1])][Character.getNumericValue(a[4])].charAt(c) == 'N' || A[Character.getNumericValue(b[1])][Character.getNumericValue(b[4])].charAt(d) == 'N'){
-                return false;} else return S[Character.getNumericValue(a[1])][Character.getNumericValue(a[4])].charAt(c) == A[Character.getNumericValue(b[1])][Character.getNumericValue(b[4])].charAt(d) ; }
-
-            else if (a[0] == 'S' && b[0] == 'B') { if (S[Character.getNumericValue(a[1])][Character.getNumericValue(a[4])].charAt(c) == 'N' || B[Character.getNumericValue(b[1])][Character.getNumericValue(b[4])].charAt(d) == 'N'){
-                return false;} else return S[Character.getNumericValue(a[1])][Character.getNumericValue(a[4])].charAt(c) == B[Character.getNumericValue(b[1])][Character.getNumericValue(b[4])].charAt(d) ; }
         }
         return false;
     }
+
+
+
     /**
      * Given a well-formed board string representing an ordered list of placements,
      * determine whether the board string is valid.
@@ -108,9 +92,39 @@ public class RailroadInk {
      * @return true if placement sequence is valid
      */
     public static boolean isValidPlacementSequence(String boardString) {
-        // FIXME Task 6: determine whether the given placement sequence is valid
-        return false;
+
+        int listLength = boardString.length()/5;
+        String[] tilesPlacementList = new String[listLength];
+
+        int count = 0;
+        for (int i=0; i<boardString.length(); i=i+5){
+            tilesPlacementList[count] = boardString.substring(i,i+5);
+            count++;
+        }
+
+        if(!Board.isConnectedToExit(tilesPlacementList[0])){
+            return false;
+        }
+
+        for(int index = 1; index<tilesPlacementList.length; index++) {
+
+            if(Board.isAtExit(tilesPlacementList[index])){
+                if(!Board.isConnectedToExit(tilesPlacementList[index])){
+                    return false;
+                }
+            }else {
+                String[] previousPlacements = new String[index];
+                System.arraycopy(tilesPlacementList, 0, previousPlacements, 0, index);
+                if (!Board.hasConnectedNeighbors(tilesPlacementList[index], previousPlacements)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+
     }
+
+
 
     /**
      * Generate a random dice roll as a string of eight characters.
@@ -170,74 +184,5 @@ public class RailroadInk {
         // FIXME Task 12: compute the total score including bonus points
         return -1;
     }
-
-    /*
-    Generic function to find the index of an element in a char array in Java
-     */
-    public static int find(char[] a, char target)
-    {
-        for (int i = 0; i < a.length; i++)
-            if (target == (a[i]))
-                return i;
-        return -1;
-    }
-
-    /*
-    find the index of the direction where two tiles connected in the first tile
-    */
-    public static int findPosition(String a, String b){
-        char[] i = {'A','B','C','D','E','F','G'};
-        if(a.charAt(2) == b.charAt(2)){ // two tiles are vertical
-            if (Integer.valueOf(a.charAt(3)) < Integer.valueOf(b.charAt(3))){return 1; } // compared between indexes of one row
-            else return 3;}
-
-        else // two tiles are parallel
-            if(find(i,a.charAt(2)) < find(i,b.charAt(2))){return 2;} // compared between indexes of one column
-            else return 0;
-    }
-
-    /*
-    return the index of the direction in the second tile
-    */
-    public static int findPosition1(int a) {
-        if (a == 2) { // the two indexes are symmetric
-            return 0;
-        } else if (a == 3) {
-            return 1;
-        } else return a + 2;
-    }
-
-
-    /*
-    determine whether the two tiles are neighnours
-     */
-    public static boolean areNeighbours (String tilePlacementStringA, String tilePlacementStringB){
-        char[] a = tilePlacementStringA.toCharArray();
-        char[] b = tilePlacementStringB.toCharArray();
-        char[] i = {'A','B','C','D','E','F','G'}; //an array of every row
-        char[] n = {'0','1','2','3','4','5','6'}; //an array of every column
-        if(a[2]==b[2] && (a[3]!= '0')&& (a[3]!= '6')) { // two tiles are vertical
-            return !((b[3] != n[(find(n, a[3]) + 1)]) && (b[3] != n[(find(n, a[3]) - 1)])); } // determine whether they are neighbours in one column
-
-        else if(a[2]==b[2] && (a[3]== '0')) {
-            return !(b[3] != n[(find(n, a[3]) + 1)]); }
-
-        else if(a[2]==b[2] && (a[3]== '6')) {
-            return !(b[3] != n[(find(n, a[3]) - 1)]); }
-
-        else if(a[3]==b[3]&& (a[2]!= 'A')&& (a[2]!= 'G')){ //two tiles are parallel
-            return !((b[2]!=i[(find(i,a[2])+1)]) && (b[2]!=i[(find(i,a[2])-1)]));} // determine whether they are neighbours in one row
-
-        else if (a[3]==b[3] && (a[2]== 'A')) {
-            return !(b[2] != i[(find(i, a[2]) + 1)]); }
-
-        else if (a[3]==b[3] && (a[2]== 'G')) {
-            return !(b[2] != i[(find(i, a[2]) - 1)]);}
-
-        else if ((a[2]!=b[2])&&(a[3]!=b[3])){return false;} // they are neither one row nor one column
-        else return true;
-    }
-
 }
-
 
