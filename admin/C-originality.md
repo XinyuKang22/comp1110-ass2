@@ -1,9 +1,7 @@
 We declare that the work we have submitted for Stage C of this assignment and all stages before it is entirely our own work, with the following documented exceptions:
 
-* The idea of using <...> to make the game run faster came from a discussion with <...> (noted in source code comments)
+* Methods isTilePlacementWellFormed, isBoardStringWellFormed, areConnectedNeighbours,
+  generateDiceRoll, getBasicScore and getAdvancedScore in the original class RailwayInk are 
+  used in our skeleton. Part of parameters and return types have been changed to achieve simpler function.
 
-* The code in class <...> is based on a solution we found when researching the problem (URL provided in source code comments)
-
-*  ....
-
-Signed: Mary Jones (u2345678), Bob Smith (u3456789), and Sue Black (u0123456)
+Signed:  Xinyu Kang (u6120911), Elton Li (u6662643), and Yinuo Zhang (u6598700)
