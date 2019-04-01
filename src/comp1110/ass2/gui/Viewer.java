@@ -9,6 +9,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
 /**
@@ -19,8 +20,8 @@ import javafx.stage.Stage;
  */
 public class Viewer extends Application {
     /* board layout */
-    private static final int VIEWER_WIDTH = 1024;
-    private static final int VIEWER_HEIGHT = 768;
+    private static final int VIEWER_WIDTH = 700;
+    private static final int VIEWER_HEIGHT = 700;
 
     private static final String URI_BASE = "assets/";
 
@@ -34,9 +35,10 @@ public class Viewer extends Application {
      *
      * @param placement A valid placement string
      */
-    void makePlacement(String placement) {
+    public void makePlacement(String placement) {
         // FIXME Task 4: implement the simple placement viewer
 
+        StackPane pane = new StackPane();
         ImageView board = new ImageView();
         board.setImage(new Image(Viewer.class.getResource(Viewer.URI_BASE + "Board.jpg").toString()));
         board.setFitHeight(700);
@@ -109,6 +111,10 @@ public class Viewer extends Application {
         s5.setImage(new Image(Viewer.class.getResource(Viewer.URI_BASE + "S5.png").toString()));
         s5.setFitHeight(100);
         s5.setFitWidth(100);
+
+        pane.getChildren().add(board);
+
+        root.getChildren().add(pane);
     }
 
     /**
