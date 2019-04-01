@@ -1,5 +1,7 @@
 package comp1110.ass2;
 
+import comp1110.ass2.gui.Board;
+
 public class RailroadInk {
     /**
      * Determine whether a tile placement string is well-formed:
@@ -45,9 +47,33 @@ public class RailroadInk {
      * @return true if the placements are connected neighbours
      */
     public static boolean areConnectedNeighbours(String tilePlacementStringA, String tilePlacementStringB) {
-        // FIXME Task 5: determine whether neighbouring placements are connected
+
+        if(!Board.areNeighbors(tilePlacementStringA,tilePlacementStringB)){
+            return false;
+        }
+
+        String[] infoA = Board.rotatedTileInfo(tilePlacementStringA);
+        String[] infoB = Board.rotatedTileInfo(tilePlacementStringB);
+
+        int B_relativeTo_A = Board.relativePosition(tilePlacementStringA,tilePlacementStringB);
+
+        if(B_relativeTo_A==0){
+            return infoB[2].equals(infoA[0]) && !infoA[0].equals("Nothing");
+
+        }else if (B_relativeTo_A==1){
+            return infoB[3].equals(infoA[1]) && !infoA[1].equals("Nothing");
+
+        }else if (B_relativeTo_A==2){
+            return infoB[0].equals(infoA[2]) && !infoA[2].equals("Nothing");
+
+        }else if (B_relativeTo_A==3){
+            return infoB[1].equals(infoA[3]) && !infoA[3].equals("Nothing");
+
+        }
         return false;
     }
+
+
 
     /**
      * Given a well-formed board string representing an ordered list of placements,
@@ -66,9 +92,39 @@ public class RailroadInk {
      * @return true if placement sequence is valid
      */
     public static boolean isValidPlacementSequence(String boardString) {
-        // FIXME Task 6: determine whether the given placement sequence is valid
-        return false;
+
+        int listLength = boardString.length()/5;
+        String[] tilesPlacementList = new String[listLength];
+
+        int count = 0;
+        for (int i=0; i<boardString.length(); i=i+5){
+            tilesPlacementList[count] = boardString.substring(i,i+5);
+            count++;
+        }
+
+        if(!Board.isConnectedToExit(tilesPlacementList[0])){
+            return false;
+        }
+
+        for(int index = 1; index<tilesPlacementList.length; index++) {
+
+            if(Board.isAtExit(tilesPlacementList[index])){
+                if(!Board.isConnectedToExit(tilesPlacementList[index])){
+                    return false;
+                }
+            }else {
+                String[] previousPlacements = new String[index];
+                System.arraycopy(tilesPlacementList, 0, previousPlacements, 0, index);
+                if (!Board.hasConnectedNeighbors(tilesPlacementList[index], previousPlacements)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+
     }
+
+
 
     /**
      * Generate a random dice roll as a string of eight characters.

@@ -31,5 +31,24 @@ public enum Tiles {
         this.centre=centre;
     }
 
+    public static String getNorth(Tiles tile){
+        return tile.north;
+    }
+
+    public static String getEast(Tiles tile){
+        return tile.east;
+    }
+
+    public static String getSouth(Tiles tile){
+        return tile.south;
+    }
+
+    public static String getWest(Tiles tile){
+        return tile.west;
+    }
+
+    public static String getCentre(Tiles tile){
+        return tile.centre;
+    }
 
 }
