@@ -83,7 +83,6 @@ public class RailroadInk {
         if (boardString == ""){
             return false;
         }
-
         char[] a = boardString.toCharArray();
         if (boardString.length() > 155 || boardString.length() %5 != 0){
         return false;
