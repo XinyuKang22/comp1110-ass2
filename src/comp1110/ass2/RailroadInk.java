@@ -77,7 +77,7 @@ public class RailroadInk {
      */
     public static boolean isBoardStringWellFormed(String boardString) {
         // FIXME Task 3: determine whether a board string is well-formed
-        if (boardString == null){d
+        if (boardString == null){
             return false;
         }
         if (boardString == ""){
