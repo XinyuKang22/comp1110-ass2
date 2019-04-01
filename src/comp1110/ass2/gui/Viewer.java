@@ -8,9 +8,10 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
-
+import comp1110.ass2.RailroadInk;
 /**
  * A very simple viewer for tile placements in the Railroad Ink game.
  * <p>
@@ -36,79 +37,27 @@ public class Viewer extends Application {
      */
     void makePlacement(String placement) {
         // FIXME Task 4: implement the simple placement viewer
+        if (!RailroadInk.isValidPlacementSequence(placement)){
+            throw new IllegalArgumentException("Bad placement " + placement);
+        }else{
+            GridPane gridPane = new GridPane();
+            gridPane.setPrefSize(624.0D, 624.0D);
+            gridPane.setMaxSize(624.0D, 624.0D);
+            gridPane.setGridLinesVisible(true);
 
-        ImageView board = new ImageView();
-        board.setImage(new Image(Viewer.class.getResource(Viewer.URI_BASE + "Board.jpg").toString()));
-        board.setFitHeight(700);
-        board.setFitWidth(700);
-        ImageView highExit = new ImageView();
-        highExit.setImage(new Image(Viewer.class.getResource(Viewer.URI_BASE + "HighExit.png").toString()));
-        highExit.setFitHeight(100);
-        highExit.setFitWidth(100);
-        ImageView railExit = new ImageView();
-        railExit.setImage(new Image(Viewer.class.getResource(Viewer.URI_BASE + "RailExit.png").toString()));
-        railExit.setFitHeight(100);
-        railExit.setFitWidth(100);
-        ImageView a0 = new ImageView();
-        a0.setImage(new Image(Viewer.class.getResource(Viewer.URI_BASE + "A0.png").toString()));
-        a0.setFitHeight(100);
-        a0.setFitWidth(100);
-        ImageView a1 = new ImageView();
-        a1.setImage(new Image(Viewer.class.getResource(Viewer.URI_BASE + "A1.png").toString()));
-        a1.setFitHeight(100);
-        a1.setFitWidth(100);
-        ImageView a2 = new ImageView();
-        a2.setImage(new Image(Viewer.class.getResource(Viewer.URI_BASE + "A2.png").toString()));
-        a2.setFitHeight(100);
-        a2.setFitWidth(100);
-        ImageView a3 = new ImageView();
-        a3.setImage(new Image(Viewer.class.getResource(Viewer.URI_BASE + "A3.png").toString()));
-        a3.setFitHeight(100);
-        a3.setFitWidth(100);
-        ImageView a4 = new ImageView();
-        a4.setImage(new Image(Viewer.class.getResource(Viewer.URI_BASE + "A4.png").toString()));
-        a4.setFitHeight(100);
-        a4.setFitWidth(100);
-        ImageView a5 = new ImageView();
-        a5.setImage(new Image(Viewer.class.getResource(Viewer.URI_BASE + "A5.png").toString()));
-        a5.setFitHeight(100);
-        a5.setFitWidth(100);
-        ImageView b0 = new ImageView();
-        b0.setImage(new Image(Viewer.class.getResource(Viewer.URI_BASE + "B0.png").toString()));
-        b0.setFitHeight(100);
-        b0.setFitWidth(100);
-        ImageView b1 = new ImageView();
-        b1.setImage(new Image(Viewer.class.getResource(Viewer.URI_BASE + "B1.png").toString()));
-        b1.setFitHeight(100);
-        b1.setFitWidth(100);
-        ImageView b2 = new ImageView();
-        b2.setImage(new Image(Viewer.class.getResource(Viewer.URI_BASE + "B2.png").toString()));
-        b2.setFitHeight(100);
-        b2.setFitWidth(100);
-        ImageView s0 = new ImageView();
-        s0.setImage(new Image(Viewer.class.getResource(Viewer.URI_BASE + "S0.png").toString()));
-        s0.setFitHeight(100);
-        s0.setFitWidth(100);
-        ImageView s1 = new ImageView();
-        s1.setImage(new Image(Viewer.class.getResource(Viewer.URI_BASE + "S1.png").toString()));
-        s1.setFitHeight(100);
-        s1.setFitWidth(100);
-        ImageView s2 = new ImageView();
-        s2.setImage(new Image(Viewer.class.getResource(Viewer.URI_BASE + "S2.png").toString()));
-        s2.setFitHeight(100);
-        s2.setFitWidth(100);
-        ImageView s3 = new ImageView();
-        s3.setImage(new Image(Viewer.class.getResource(Viewer.URI_BASE + "S3.png").toString()));
-        s3.setFitHeight(100);
-        s3.setFitWidth(100);
-        ImageView s4 = new ImageView();
-        s4.setImage(new Image(Viewer.class.getResource(Viewer.URI_BASE + "S4.png").toString()));
-        s4.setFitHeight(100);
-        s4.setFitWidth(100);
-        ImageView s5 = new ImageView();
-        s5.setImage(new Image(Viewer.class.getResource(Viewer.URI_BASE + "S5.png").toString()));
-        s5.setFitHeight(100);
-        s5.setFitWidth(100);
+            String tile = placement.substring(0,2);
+            String location = placement.substring(2,4);
+            String orientation = placement.substring(4);
+
+            ImageView tileImage = new ImageView();
+            tileImage.setImage(new Image(Viewer.class.getResource("assets/" + tile + ".png").toString()));
+            tileImage.setRotate((double) Double.parseDouble(orientation)*90);
+
+            this.root.getChildren().add(gridPane);
+        }
+
+
+
     }
 
     /**
