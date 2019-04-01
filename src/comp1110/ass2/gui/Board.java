@@ -16,8 +16,10 @@ public class Board extends RailroadInk {
             "F0","F1","F2","F3","F4","F5","F6",
             "G0","G1","G2","G3","G4","G5","G6"};
 
+
+
     /**
-     * Given a location string, determine its index in "grid"
+     * Given a location string, find its index in "grid"
      * @param theLocation i.e. "A4" "D3" "G6"
      * @return the index of the location string in "grid" , which can be any integer between [0,48]
      */
@@ -32,62 +34,76 @@ public class Board extends RailroadInk {
     }
 
 
-    public static String[] getNearbyGrids (String theLocation){
+
+    /**
+     * Given a grid, find the grids near it.
+     * i.e. input:"C2", output: {"B2","D2","C1","C3"}
+     * @param theLocation location string representing the grid
+     * @return location string list of grids on the top, bottom, left and right(if there is any)
+     */
+    public static String[] getNearbyGrids (String theLocation) {
 
         int theIndex = findLocationIndex(theLocation);
 
-        String[] s = new String[4];
-        if(theLocation.equals("B6") || theLocation.equals("C6") || theLocation.equals("D6") ||theLocation.equals("E6") ||theLocation.equals("F6") ){
-            s[0]=grid[theIndex-7];
-            s[1]=grid[theIndex+7];
-            s[2]=grid[theIndex-1];
-        }else if(theLocation.equals("B0") || theLocation.equals("C0") || theLocation.equals("D0") ||theLocation.equals("E0") ||theLocation.equals("F0") ){
-            s[0]=grid[theIndex-7];
-            s[1]=grid[theIndex+7];
-            s[2]=grid[theIndex+1];
-        }else if(theLocation.equals("A1") ||theLocation.equals("A2") ||theLocation.equals("A3") ||theLocation.equals("A4") ||theLocation.equals("A5") ){
-            s[0]=grid[theIndex+7];
-            s[1]=grid[theIndex-1];
-            s[2]=grid[theIndex+1];
-        }else if(theLocation.equals("G1") ||theLocation.equals("G2") ||theLocation.equals("G3") ||theLocation.equals("G4") ||theLocation.equals("G5") ){
-            s[0]=grid[theIndex-7];
-            s[1]=grid[theIndex-1];
-            s[2]=grid[theIndex+1];
-        }else if(theLocation.equals("A0")){
-            s[0]=grid[theIndex+7];
-            s[1]=grid[theIndex+1];
-        }else if(theLocation.equals("A6")){
-            s[0]=grid[theIndex+7];
-            s[1]=grid[theIndex-1];
-        }else if(theLocation.equals("G0")){
-            s[0]=grid[theIndex-7];
-            s[1]=grid[theIndex+1];
-        }else if(theLocation.equals("G6")){
-            s[0]=grid[theIndex-7];
-            s[1]=grid[theIndex-1];
+        String[] nearbyGrids = new String[4];
+
+        // Considered situations of having only two nearby grids, having three, and for most of them, having four.
+        if (theLocation.equals("A0")) {
+            nearbyGrids[0] = grid[theIndex + 7];
+            nearbyGrids[1] = grid[theIndex + 1];
+        } else if (theLocation.equals("A6")) {
+            nearbyGrids[0] = grid[theIndex + 7];
+            nearbyGrids[1] = grid[theIndex - 1];
+        } else if (theLocation.equals("G0")) {
+            nearbyGrids[0] = grid[theIndex - 7];
+            nearbyGrids[1] = grid[theIndex + 1];
+        } else if (theLocation.equals("G6")) {
+            nearbyGrids[0] = grid[theIndex - 7];
+            nearbyGrids[1] = grid[theIndex - 1];
+        }else if (theLocation.equals("B6") || theLocation.equals("C6") || theLocation.equals("D6") ||theLocation.equals("E6") ||theLocation.equals("F6") ) {
+            nearbyGrids[0]=grid[theIndex-7];
+            nearbyGrids[1]=grid[theIndex+7];
+            nearbyGrids[2]=grid[theIndex-1];
+        }else if (theLocation.equals("B0") || theLocation.equals("C0") || theLocation.equals("D0") ||theLocation.equals("E0") ||theLocation.equals("F0") ){
+            nearbyGrids[0]=grid[theIndex-7];
+            nearbyGrids[1]=grid[theIndex+7];
+            nearbyGrids[2]=grid[theIndex+1];
+        }else if (theLocation.equals("A1") ||theLocation.equals("A2") ||theLocation.equals("A3") ||theLocation.equals("A4") ||theLocation.equals("A5") ){
+            nearbyGrids[0]=grid[theIndex+7];
+            nearbyGrids[1]=grid[theIndex-1];
+            nearbyGrids[2]=grid[theIndex+1];
+        }else if (theLocation.equals("G1") ||theLocation.equals("G2") ||theLocation.equals("G3") ||theLocation.equals("G4") ||theLocation.equals("G5") ){
+            nearbyGrids[0]=grid[theIndex-7];
+            nearbyGrids[1]=grid[theIndex-1];
+            nearbyGrids[2]=grid[theIndex+1];
         }else {
-            s[0]=grid[theIndex-7];
-            s[1]=grid[theIndex+7];
-            s[2]=grid[theIndex-1];
-            s[3]=grid[theIndex+1];
+            nearbyGrids[0]=grid[theIndex-7];
+            nearbyGrids[1]=grid[theIndex+7];
+            nearbyGrids[2]=grid[theIndex-1];
+            nearbyGrids[3]=grid[theIndex+1];
         }
 
-        int countValidNeighborLocation =0;
-        for(String neighbor:s){
-            if(neighbor!=null){
-                countValidNeighborLocation++;
+        int countNotNull =0;
+        for(String grid:nearbyGrids){
+            if(grid!=null){
+                countNotNull++;
             }
         }
 
-        String[] toReturn = new String[countValidNeighborLocation];
-        for(int i = 0;i<countValidNeighborLocation;i++){
-            toReturn[i]=s[i];
-        }
+        String[] toReturn = new String[countNotNull];
+        System.arraycopy(nearbyGrids,0,toReturn,0,countNotNull);
+
         return toReturn;
     }
 
 
 
+    /**
+     * Given two tile placement string, return whether they are adjacent.
+     * @param tilePlacementStringA
+     * @param tilePlacementStringB
+     * @return if they are adjacent, return true.
+     */
     public static boolean areNeighbors (String tilePlacementStringA,String tilePlacementStringB){
         String locationA = tilePlacementStringA.substring(2,4);
         String locationB = tilePlacementStringB.substring(2,4);
@@ -103,8 +119,12 @@ public class Board extends RailroadInk {
 
 
 
-
-    //返回当前旋转情况下，上、右、下、左、中的情况
+    /**
+     * Given a tile placement string, find the edge/centre details(like, "Highway","Station" , and so on) in given orientation.
+     * @param tilePlacementString
+     * @return a list of five strings, recorded information of the tile in current orientation.
+     *         the strings are ordered with UPLR and Centre.
+     */
     public static String[] rotatedTileInfo (String tilePlacementString) {
         String[] info = new String[5];
         String tileString = tilePlacementString.substring(0,2);
@@ -164,6 +184,9 @@ public class Board extends RailroadInk {
         return info;
     }
 
+
+
+    //Determine whether the tile is at one of the exits
     public static boolean isAtExit (String tilePlacementString){
         String[] exits = {"A1","A5","D0","D6","G1","G5","A3","B0","B6","F0","F6","G3"};
 
@@ -178,6 +201,9 @@ public class Board extends RailroadInk {
     }
 
 
+
+    // Determine whether the tile is connected to the exit.
+    // Highway edge should connect to highway exit, and same for Railway.
     public static boolean isConnectedToExit (String tilePlacementString){
 
         if(isAtExit(tilePlacementString)){
@@ -222,6 +248,17 @@ public class Board extends RailroadInk {
     }
 
 
+
+
+    /**
+     * Find the relative position of B for A
+     * @param referencePlacement
+     * @param thePlacement
+     * @return int 0 represents thePlacement is on referencePlacement;
+     *         int 1 represents thePlacement is on the left of referencePlacement;
+     *         int 2 represents thePlacement is under referencePlacement;
+     *         int 3 represents thePlacement is on the right of referencePlacement;
+     */
     public static int relativePosition (String referencePlacement, String thePlacement){
         String referenceRow = referencePlacement.substring(2,3);
         String referenceColumn = referencePlacement.substring(3,4);
@@ -244,7 +281,7 @@ public class Board extends RailroadInk {
         return -1;
     }
 
-
+    //From tilePlacementList, find whether there is at least one tile connected to the tile.
     public static boolean hasConnectedNeighbors (String tilePlacementString, String[] tilePlacementList){
         for(String tilePlacement:tilePlacementList){
             if(areConnectedNeighbours(tilePlacementString,tilePlacement)){
