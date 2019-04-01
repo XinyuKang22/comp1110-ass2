@@ -17,6 +17,52 @@ public class RailroadInk {
      */
     public static boolean isTilePlacementWellFormed(String tilePlacementString) {
         // FIXME Task 2: determine whether a tile placement is well-formed
+        if (tilePlacementString.length() == 5){
+            if ((tilePlacementString.charAt(0)) == 'A' || (tilePlacementString.charAt(0)) == 'S'){
+                if ((tilePlacementString.charAt(1)) == '0' || (tilePlacementString.charAt(1)) == '1'
+                        || (tilePlacementString.charAt(1)) == '2' || (tilePlacementString.charAt(1)) == '3'
+                        || (tilePlacementString.charAt(1)) == '4' || (tilePlacementString.charAt(1)) == '5'){
+                    if ((tilePlacementString.charAt(2)) == 'A' || (tilePlacementString.charAt(2)) == 'B'
+                            || (tilePlacementString.charAt(2)) == 'C' || (tilePlacementString.charAt(2)) == 'D'
+                            || (tilePlacementString.charAt(2)) == 'E' || (tilePlacementString.charAt(2)) == 'F'
+                            || (tilePlacementString.charAt(2)) == 'G'){
+                        if ((tilePlacementString.charAt(3)) == '0' || (tilePlacementString.charAt(3)) == '1'
+                                || (tilePlacementString.charAt(3)) == '2' || (tilePlacementString.charAt(3)) == '3'
+                                || (tilePlacementString.charAt(3)) == '4' || (tilePlacementString.charAt(3)) == '5'
+                                || (tilePlacementString.charAt(3)) == '6'){
+                            if ((tilePlacementString.charAt(4)) == '0' || (tilePlacementString.charAt(4)) == '1'
+                                    || (tilePlacementString.charAt(4)) == '2' || (tilePlacementString.charAt(4)) == '3'
+                                    || (tilePlacementString.charAt(4)) == '4' || (tilePlacementString.charAt(4)) == '5'
+                                    || (tilePlacementString.charAt(4)) == '6' || (tilePlacementString.charAt(4)) == '7')
+                            {return true;}
+                        }
+                    }
+                }
+            }
+//            {return true;}
+        }
+        if (tilePlacementString.length() == 5){
+            if ((tilePlacementString.charAt(0)) == 'B'){
+                if ((tilePlacementString.charAt(1)) == '0' || (tilePlacementString.charAt(1)) == '1'
+                        || (tilePlacementString.charAt(1)) == '2'){
+                    if ((tilePlacementString.charAt(2)) == 'A' || (tilePlacementString.charAt(2)) == 'B'
+                            || (tilePlacementString.charAt(2)) == 'C' || (tilePlacementString.charAt(2)) == 'D'
+                            || (tilePlacementString.charAt(2)) == 'E' || (tilePlacementString.charAt(2)) == 'F'
+                            || (tilePlacementString.charAt(2)) == 'G'){
+                        if ((tilePlacementString.charAt(3)) == '0' || (tilePlacementString.charAt(3)) == '1'
+                                || (tilePlacementString.charAt(3)) == '2' || (tilePlacementString.charAt(3)) == '3'
+                                || (tilePlacementString.charAt(3)) == '4' || (tilePlacementString.charAt(3)) == '5'
+                                || (tilePlacementString.charAt(3)) == '6'){
+                            if ((tilePlacementString.charAt(4)) == '0' || (tilePlacementString.charAt(4)) == '1'
+                                    || (tilePlacementString.charAt(4)) == '2' || (tilePlacementString.charAt(4)) == '3'
+                                    || (tilePlacementString.charAt(4)) == '4' || (tilePlacementString.charAt(4)) == '5'
+                                    || (tilePlacementString.charAt(4)) == '6' || (tilePlacementString.charAt(4)) == '7')
+                            {return true;}
+                        }
+                    }
+                }
+            }
+        }
         return false;
     }
 
