@@ -15,6 +15,10 @@ public class RailroadInk {
      * @param tilePlacementString a candidate tile placement string
      * @return true if the tile placement is well formed
      */
+
+    //isTIlePlacementWellFormed was just pattern matched to assignment 1. The function uses simple if statements and
+    //as 'B' is different to 'A' and 'S,' another case was created even though apart from the 2nd character everything
+    //else is the same.
     public static boolean isTilePlacementWellFormed(String tilePlacementString) {
         // FIXME Task 2: determine whether a tile placement is well-formed
         if (tilePlacementString.length() == 5){
@@ -39,7 +43,6 @@ public class RailroadInk {
                     }
                 }
             }
-//            {return true;}
         }
         if (tilePlacementString.length() == 5){
             if ((tilePlacementString.charAt(0)) == 'B'){
@@ -75,6 +78,12 @@ public class RailroadInk {
      * @param boardString a board string describing the placement of one or more pieces
      * @return true if the board string is well-formed
      */
+
+    //isBoardStringWellFormed is far too difficult to brute force and hence uses loops to check each of the
+    //characters. The function checks for null cases first, then invalid cases with strings over 155 characters
+    //  long as well as incomplete cases using `mod` 5. A loop and array were used to scroll through the string in
+    // conjunction with isTilePlacementWellFormed to check if every 5 characters is indeed a valid tile. Special tiles
+    // are checked by looking for S and loops until there are 3 until it returns false.
     public static boolean isBoardStringWellFormed(String boardString) {
         // FIXME Task 3: determine whether a board string is well-formed
         if (boardString == null){
