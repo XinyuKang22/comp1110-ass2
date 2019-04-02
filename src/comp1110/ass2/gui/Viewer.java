@@ -39,23 +39,44 @@ public class Viewer extends Application {
         // FIXME Task 4: implement the simple placement viewer
         if (!RailroadInk.isValidPlacementSequence(placement)){
             throw new IllegalArgumentException("Bad placement " + placement);
-        }else{
+        }else {
             GridPane gridPane = new GridPane();
             gridPane.setPrefSize(624.0D, 624.0D);
             gridPane.setMaxSize(624.0D, 624.0D);
             gridPane.setGridLinesVisible(true);
 
-            String tile = placement.substring(0,2);
-            String location = placement.substring(2,4);
+            String tile = placement.substring(0, 2);
+            String location = placement.substring(2, 4);
             String orientation = placement.substring(4);
 
             ImageView tileImage = new ImageView();
             tileImage.setImage(new Image(Viewer.class.getResource("assets/" + tile + ".png").toString()));
-            tileImage.setRotate((double) Double.parseDouble(orientation)*90);
+            tileImage.setRotate((double) Double.parseDouble(orientation) * 90);
 
+            gridPane.getChildren().add(tileImage);
+            gridPane.setRowIndex(tileImage, 7);
+            gridPane.setColumnSpan(tileImage, 7);
+
+            switch (location.charAt(0)) {
+                case 'A':
+                    break;
+                case 'B':
+                    break;
+                case 'C':
+                    break;
+                case 'D':
+                    break;
+                case 'E':
+                    break;
+                case 'F':
+                    break;
+                case 'G':
+                    break;
+                default:
+                    break;
+            }
             this.root.getChildren().add(gridPane);
         }
-
 
 
     }
