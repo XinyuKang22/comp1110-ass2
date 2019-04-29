@@ -37,6 +37,8 @@ public class Viewer extends Application {
     ImageView img;
     GridPane grid;
 
+
+    //draw a grid
     private void displayGrid() {
         this.grid = new GridPane();
         this.grid.setPrefSize(722,650); // (560+162, 560+90)
@@ -58,6 +60,7 @@ public class Viewer extends Application {
             grid.getColumnConstraints().add(col);
         }
 
+        //set up exits
         ImageView exitB0 = new ImageView();
         exitB0.setImage(new Image(Viewer.class.getResource(URI_BASE+"RailExit.png").toString()));
         exitB0.setFitHeight(80);
@@ -183,6 +186,7 @@ public class Viewer extends Application {
            int colPosition = Integer.parseInt(placement.substring(i+3,i+4))*80+162;
            int orientation = Integer.parseInt(placement.substring(i+4,i+5))*90;
 
+           //set up tile
            img = new ImageView();
            img.setImage(new Image(Viewer.class.getResource(URI_BASE+tile+".png").toString()));
            img.setRotate(orientation);

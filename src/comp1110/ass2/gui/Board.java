@@ -126,54 +126,54 @@ public class Board extends RailroadInk {
      *         the strings are ordered with UPLR and Centre.
      */
     public static String[] rotatedTileInfo (String tilePlacementString) {
-        String[] info = new String[5];
+        String[] info = new String[5]; //record the information for the top, right, bottom, left and centre of the rotated tile
         String tileString = tilePlacementString.substring(0,2);
         Tiles tile = Tiles.valueOf(tileString);
         String orientation = tilePlacementString.substring(4);
 
-        if(orientation.equals("0")){
+        if(orientation.equals("0")){ //original position
             info[0] = Tiles.getNorth(tile);
             info[1] = Tiles.getEast(tile);
             info[2] = Tiles.getSouth(tile);
             info[3] = Tiles.getWest(tile);
             info[4] = Tiles.getCentre(tile);
-        }else if (orientation.equals("1")){
+        }else if (orientation.equals("1")){ //clockwise 90 degree
             info[1] = Tiles.getNorth(tile);
             info[2] = Tiles.getEast(tile);
             info[3] = Tiles.getSouth(tile);
             info[0] = Tiles.getWest(tile);
             info[4] = Tiles.getCentre(tile);
-        }else if (orientation.equals("2")){
+        }else if (orientation.equals("2")){ //clockwise 180 degree
             info[2] = Tiles.getNorth(tile);
             info[3] = Tiles.getEast(tile);
             info[0] = Tiles.getSouth(tile);
             info[1] = Tiles.getWest(tile);
             info[4] = Tiles.getCentre(tile);
-        }else if (orientation.equals("3")){
+        }else if (orientation.equals("3")){ //clockwise 270 degree
             info[3] = Tiles.getNorth(tile);
             info[0] = Tiles.getEast(tile);
             info[1] = Tiles.getSouth(tile);
             info[2] = Tiles.getWest(tile);
             info[4] = Tiles.getCentre(tile);
-        }else if (orientation.equals("4")){
+        }else if (orientation.equals("4")){ //mirroring orientation 0
             info[0] = Tiles.getNorth(tile);
             info[3] = Tiles.getEast(tile);
             info[2] = Tiles.getSouth(tile);
             info[1] = Tiles.getWest(tile);
             info[4] = Tiles.getCentre(tile);
-        }else if (orientation.equals("5")){
+        }else if (orientation.equals("5")){ //clockwise 90 degree base on orientation 4
             info[1] = Tiles.getNorth(tile);
             info[0] = Tiles.getEast(tile);
             info[3] = Tiles.getSouth(tile);
             info[2] = Tiles.getWest(tile);
             info[4] = Tiles.getCentre(tile);
-        }else if (orientation.equals("6")){
+        }else if (orientation.equals("6")){//clockwise 180 degree base on orientation 4
             info[2] = Tiles.getNorth(tile);
             info[1] = Tiles.getEast(tile);
             info[0] = Tiles.getSouth(tile);
             info[3] = Tiles.getWest(tile);
             info[4] = Tiles.getCentre(tile);
-        }else if (orientation.equals("7")){
+        }else if (orientation.equals("7")){//clockwise 360 degree base on orientation 4
             info[3] = Tiles.getNorth(tile);
             info[2] = Tiles.getEast(tile);
             info[1] = Tiles.getSouth(tile);
@@ -186,10 +186,9 @@ public class Board extends RailroadInk {
 
 
 
-    //Determine whether the tile is at one of the exits
+    //Determine whether the tile is put in a position that can connect to exit
     public static boolean isAtExit (String tilePlacementString){
         String[] exits = {"A1","A5","D0","D6","G1","G5","A3","B0","B6","F0","F6","G3"};
-
         String location = tilePlacementString.substring(2,4);
 
         for(String exit:exits){
@@ -211,35 +210,35 @@ public class Board extends RailroadInk {
             String[] info = rotatedTileInfo(tilePlacementString);
 
             if(location.equals("A1") || location.equals("A5")){
-                if (info[0].equals("Highway")){
+                if (info[0].equals("Highway")){   //A1 & A5 are highway exits and can be connected by the top of tiles
                     return true;
                 }
-            }else if (location.equals("A3")){
+            }else if (location.equals("A3")){    //A3 is railway exit and can be connected by the top of tiles
                 if (info[0].equals("Railway")){
                     return true;
                 }
-            }else if (location.equals("D6")) {
+            }else if (location.equals("D6")) {  //D6 is highway exit and can be connected by the right of tiles
                 if (info[1].equals("Highway")) {
                     return true;
                 }
             }else if (location.equals("B6") || location.equals("F6")){
-                if (info[1].equals("Railway")){
+                if (info[1].equals("Railway")){ //B6 and F6 are railway exits and can be connected by the right of tiles
                     return true;
                 }
             }else if (location.equals("G1") || location.equals("G5")){
-                if (info[2].equals("Highway")){
+                if (info[2].equals("Highway")){ //G1 and G5 are highway exits and can be connected by the bottom of tiles
                     return true;
                 }
             }else if (location.equals("G3")){
-                if (info[2].equals("Railway")){
+                if (info[2].equals("Railway")){ //G3 is railway exit and can be connected by the bottom of tiles
                     return true;
                 }
             }else if (location.equals("D0")){
-                if (info[3].equals("Highway")){
+                if (info[3].equals("Highway")){//D0 is highway exit and can be connected by the left of tiles
                     return true;
                 }
             }else if (location.equals("B0") || location.equals("F0")){
-                if (info[3].equals("Railway")){
+                if (info[3].equals("Railway")){//B0 and F0 are railway exits and can be connected by the left of tiles
                     return true;
                 }
             }
@@ -267,15 +266,15 @@ public class Board extends RailroadInk {
 
         if(theColumn.equals(referenceColumn)){
             if(theRow.compareTo(referenceRow)==-1){
-                return 0;
+                return 0; //on
             }else if (theRow.compareTo(referenceRow)==1){
-                return 2;
+                return 2; //under
             }
         }else if (theRow.equals(referenceRow)){
             if(theColumn.compareTo(referenceColumn)==-1){
-                return 3;
+                return 3; //left
             }else if (theColumn.compareTo(referenceColumn)==1){
-                return 1;
+                return 1; //right
             }
         }
         return -1;

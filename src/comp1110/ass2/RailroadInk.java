@@ -175,13 +175,13 @@ public class RailroadInk {
         int listLength = boardString.length()/5;
         String[] tilesPlacementList = new String[listLength];
 
-        int count = 0;
+        int count = 0;  //count the number of tile placement string that already included
         for (int i=0; i<boardString.length(); i=i+5){
             tilesPlacementList[count] = boardString.substring(i,i+5);
             count++;
         }
 
-        if(!Board.isConnectedToExit(tilesPlacementList[0])){
+        if(!Board.isConnectedToExit(tilesPlacementList[0])){ //check whether 1st tile connected to exit
             return false;
         }
 
