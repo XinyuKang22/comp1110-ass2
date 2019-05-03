@@ -1,7 +1,6 @@
 package comp1110.ass2.gui;
 
 import javafx.application.Application;
-
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -33,7 +32,6 @@ public class Viewer extends Application {
     TextField textField =new TextField();
     ImageView img;
     GridPane grid;
-
 
     //draw a grid
     private void displayGrid() {
@@ -90,6 +88,8 @@ public class Viewer extends Application {
         exitB6.setLayoutX(150+65*7);
         exitB6.setLayoutY(100+65);
         exitB6.setRotate(90);
+
+
         root.getChildren().add(exitB6);
 
         ImageView exitD6 = new ImageView();
@@ -179,12 +179,21 @@ public class Viewer extends Application {
            String tile = placement.substring(i,i+2);
            int rowPosition = (placement.substring(i+2,i+3).hashCode()-65)*65+100;
            int colPosition = Integer.parseInt(placement.substring(i+3,i+4))*65+150;
-           int orientation = Integer.parseInt(placement.substring(i+4,i+5))*90;
+           int orientation = Integer.parseInt(placement.substring(i+4,i+5));
+           int angle;
+           if(orientation<4){
+               angle = orientation*90;
+           }else {
+               angle = (orientation-4)*90;
+           }
 
            //set up tile
            img = new ImageView();
            img.setImage(new Image(Viewer.class.getResource(URI_BASE+tile+".png").toString()));
-           img.setRotate(orientation);
+           img.setRotate(angle);
+           if(orientation>=4){
+               img.setScaleX(-1);
+           }
            img.setFitWidth(65);
            img.setFitHeight(65);
            img.setPreserveRatio(true);
