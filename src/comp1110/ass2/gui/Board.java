@@ -254,9 +254,9 @@ public class Board extends RailroadInk {
      * @param referencePlacement
      * @param thePlacement
      * @return int 0 represents thePlacement is on referencePlacement;
-     *         int 1 represents thePlacement is on the left of referencePlacement;
+     *         int 1 represents thePlacement is on the right of referencePlacement;
      *         int 2 represents thePlacement is under referencePlacement;
-     *         int 3 represents thePlacement is on the right of referencePlacement;
+     *         int 3 represents thePlacement is on the left of referencePlacement;
      */
     public static int relativePosition (String referencePlacement, String thePlacement){
         String referenceRow = referencePlacement.substring(2,3);
