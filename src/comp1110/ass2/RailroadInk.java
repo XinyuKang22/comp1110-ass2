@@ -86,16 +86,10 @@ public class RailroadInk {
     // are checked by looking for S and loops until there are 3 until it returns false.
     public static boolean isBoardStringWellFormed(String boardString) {
         // FIXME Task 3: determine whether a board string is well-formed
-        if (boardString == null){
-            return false;
-        }
-        if (boardString == ""){
+        if (boardString == null || boardString == "" || boardString.length() > 155 || boardString.length() %5 != 0){
             return false;
         }
         char[] a = boardString.toCharArray();
-        if (boardString.length() > 155 || boardString.length() %5 != 0){
-        return false;
-        }
         int n = 0;
         int x = 0;
         while (n < boardString.length()){
@@ -103,7 +97,7 @@ public class RailroadInk {
             String b = new String(c);
             if (isTilePlacementWellFormed(b) == false){return false;}
             if (boardString.charAt(n) == 'S'){
-                x = x + 1;
+                x++;
             }
             n = n + 5;
         }
