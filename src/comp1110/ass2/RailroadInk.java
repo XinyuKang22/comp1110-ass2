@@ -21,52 +21,44 @@ public class RailroadInk {
     //else is the same.
     public static boolean isTilePlacementWellFormed(String tilePlacementString) {
         // FIXME Task 2: determine whether a tile placement is well-formed
-        if (tilePlacementString.length() == 5){
-            if ((tilePlacementString.charAt(0)) == 'A' || (tilePlacementString.charAt(0)) == 'S'){
-                if ((tilePlacementString.charAt(1)) == '0' || (tilePlacementString.charAt(1)) == '1'
-                        || (tilePlacementString.charAt(1)) == '2' || (tilePlacementString.charAt(1)) == '3'
-                        || (tilePlacementString.charAt(1)) == '4' || (tilePlacementString.charAt(1)) == '5'){
-                    if ((tilePlacementString.charAt(2)) == 'A' || (tilePlacementString.charAt(2)) == 'B'
-                            || (tilePlacementString.charAt(2)) == 'C' || (tilePlacementString.charAt(2)) == 'D'
-                            || (tilePlacementString.charAt(2)) == 'E' || (tilePlacementString.charAt(2)) == 'F'
-                            || (tilePlacementString.charAt(2)) == 'G'){
-                        if ((tilePlacementString.charAt(3)) == '0' || (tilePlacementString.charAt(3)) == '1'
-                                || (tilePlacementString.charAt(3)) == '2' || (tilePlacementString.charAt(3)) == '3'
-                                || (tilePlacementString.charAt(3)) == '4' || (tilePlacementString.charAt(3)) == '5'
-                                || (tilePlacementString.charAt(3)) == '6'){
-                            if ((tilePlacementString.charAt(4)) == '0' || (tilePlacementString.charAt(4)) == '1'
-                                    || (tilePlacementString.charAt(4)) == '2' || (tilePlacementString.charAt(4)) == '3'
-                                    || (tilePlacementString.charAt(4)) == '4' || (tilePlacementString.charAt(4)) == '5'
-                                    || (tilePlacementString.charAt(4)) == '6' || (tilePlacementString.charAt(4)) == '7')
-                            {return true;}
-                        }
+        if(tilePlacementString.length()!=5){
+            return false;
+        }else {
+            try {
+                char first = tilePlacementString.charAt(0);
+                int second = Integer.parseInt(tilePlacementString.substring(1,2));
+                String third = tilePlacementString.substring(2,3);
+                int fourth = Integer.parseInt(tilePlacementString.substring(3,4));
+                int fifth = Integer.parseInt(tilePlacementString.substring(4));
+
+                if(first=='A' || first=='S'){
+                    if(second<0 || second>5){
+                        return false;
                     }
+                }else if(first=='B'){
+                    if(second<0 || second>2){
+                        return false;
+                    }
+                }else {
+                    return false;
                 }
+
+                if(third.hashCode()<65 || third.hashCode()>71){
+                    return false;
+                }
+
+                if(fourth<0 || fourth>6){
+                    return false;
+                }
+
+                if(fifth<0 || fifth>7){
+                    return false;
+                }
+            }catch (java.lang.NumberFormatException e){
+                return false;
             }
         }
-        if (tilePlacementString.length() == 5){
-            if ((tilePlacementString.charAt(0)) == 'B'){
-                if ((tilePlacementString.charAt(1)) == '0' || (tilePlacementString.charAt(1)) == '1'
-                        || (tilePlacementString.charAt(1)) == '2'){
-                    if ((tilePlacementString.charAt(2)) == 'A' || (tilePlacementString.charAt(2)) == 'B'
-                            || (tilePlacementString.charAt(2)) == 'C' || (tilePlacementString.charAt(2)) == 'D'
-                            || (tilePlacementString.charAt(2)) == 'E' || (tilePlacementString.charAt(2)) == 'F'
-                            || (tilePlacementString.charAt(2)) == 'G'){
-                        if ((tilePlacementString.charAt(3)) == '0' || (tilePlacementString.charAt(3)) == '1'
-                                || (tilePlacementString.charAt(3)) == '2' || (tilePlacementString.charAt(3)) == '3'
-                                || (tilePlacementString.charAt(3)) == '4' || (tilePlacementString.charAt(3)) == '5'
-                                || (tilePlacementString.charAt(3)) == '6'){
-                            if ((tilePlacementString.charAt(4)) == '0' || (tilePlacementString.charAt(4)) == '1'
-                                    || (tilePlacementString.charAt(4)) == '2' || (tilePlacementString.charAt(4)) == '3'
-                                    || (tilePlacementString.charAt(4)) == '4' || (tilePlacementString.charAt(4)) == '5'
-                                    || (tilePlacementString.charAt(4)) == '6' || (tilePlacementString.charAt(4)) == '7')
-                            {return true;}
-                        }
-                    }
-                }
-            }
-        }
-        return false;
+        return true;
     }
 
     /**
@@ -86,25 +78,21 @@ public class RailroadInk {
     // are checked by looking for S and loops until there are 3 until it returns false.
     public static boolean isBoardStringWellFormed(String boardString) {
         // FIXME Task 3: determine whether a board string is well-formed
-        if (boardString == null || boardString == "" || boardString.length() > 155 || boardString.length() %5 != 0){
-            return false;
-        }
-        char[] a = boardString.toCharArray();
-        int n = 0;
-        int x = 0;
-        while (n < boardString.length()){
-            char[] c = {a[n], a[n+1], a[n+2], a[n+3], a[n+4]};
-            String b = new String(c);
-            if (isTilePlacementWellFormed(b) == false){return false;}
-            if (boardString.charAt(n) == 'S'){
-                x++;
-            }
-            n = n + 5;
-        }
-        if (x > 3){
-            return false;
-        }
-        return true;
+       if(boardString==null || boardString==""|| boardString.length()>155 || boardString.length()%5!=0){
+           return false;
+       }else {
+           int countSpecialTile = 0;
+           for(int i =0; i<boardString.length();i=i+5){
+               String tilePlacementString = boardString.substring(i,i+5);
+               if(!isTilePlacementWellFormed(tilePlacementString)){
+                   return false;
+               }
+               if(tilePlacementString.charAt(0)=='S'){
+                   countSpecialTile++;
+               }
+           }
+           return countSpecialTile<=3;
+       }
     }
 
 
