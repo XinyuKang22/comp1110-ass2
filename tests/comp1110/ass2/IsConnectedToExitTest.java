@@ -16,7 +16,7 @@ public class IsConnectedToExitTest {
 
     static final String[] notAtExit = {"A5C37","S2A20","BOG64","B1E43","S4G01"};
 
-    static final String[] noConnection = {"A0B63","A5A56","B0G31","B1D05","A1A17"};
+    static final String[] noConnection = {"A0B63","A5A56","B0G31","B1D05","A1A17"}; // the edge connected is "Nothing"
 
     static final String[] wrongConnection = {"S1A34","A5B64","B2G30","A3F02","S3D01"};
 
