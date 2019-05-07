@@ -123,7 +123,7 @@ public class Board extends RailroadInk {
      * Given a tile placement string, find the edge/centre details(like, "Highway","Station" , and so on) in given orientation.
      * @param tilePlacementString
      * @return a list of five strings, recorded information of the tile in current orientation.
-     *         the strings are ordered with UPLR and Centre.
+     *         the strings are ordered with UPLR and Centre.  e.g. {"Highway","Railway","Railway","Railway","Station"}
      */
     public static String[] rotatedTileInfo (String tilePlacementString) {
         String[] info = new String[5]; //record the information for the top, right, bottom, left and centre of the rotated tile
