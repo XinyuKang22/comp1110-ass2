@@ -14,10 +14,10 @@ public class RailroadInk {
      * - the fourth character represents the placement column 0-6
      * - the fifth character represents the orientation 0-7
      *
+     * @author Elton Li
      * @param tilePlacementString a candidate tile placement string
      * @return true if the tile placement is well formed
      */
-    //Written by Elton Li
     public static boolean isTilePlacementWellFormed(String tilePlacementString) {
         // FIXME Task 2: determine whether a tile placement is well-formed
         if(tilePlacementString.length()!=5){
@@ -60,17 +60,17 @@ public class RailroadInk {
         return true;
     }
 
+
     /**
      * Determine whether a board string is well-formed:
      * - it consists of exactly N five-character tile placements (where N = 1 .. 31);
      * - each piece placement is well-formed
      * - no more than three special tiles are included
      *
+     * @author Elton Li
      * @param boardString a board string describing the placement of one or more pieces
      * @return true if the board string is well-formed
      */
-
-    //Written by Elton Li
     public static boolean isBoardStringWellFormed(String boardString) {
         // FIXME Task 3: determine whether a board string is well-formed
        if(boardString==null || boardString==""|| boardString.length()>155 || boardString.length()%5!=0){
@@ -100,9 +100,9 @@ public class RailroadInk {
      * invalid connection between highway and railway; and
      * areConnectedNeighbours("A0B30", "A3C23") would return false as these tiles are not neighbours.
      *
+     * @author Yinuo Zhang
      * @return true if the placements are connected neighbours
      */
-    //Written by Yinuo Zhang
     public static boolean areConnectedNeighbours(String tilePlacementStringA, String tilePlacementStringB) {
 
         if(!Board.areNeighbors(tilePlacementStringA,tilePlacementStringB)){
@@ -145,10 +145,10 @@ public class RailroadInk {
      * - A tile may have one or more edges touching a blank edge of another tile;
      *   this is referred to as disconnected, but the placement is still legal.
      *
+     * @author Xinyu Kang
      * @param boardString a board string representing some placement sequence
      * @return true if placement sequence is valid
      */
-    //Written by Xinyu Kang
     public static boolean isValidPlacementSequence(String boardString) {
 
         int listLength = boardString.length()/5;
