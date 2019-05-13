@@ -7,7 +7,7 @@ import comp1110.ass2.Tiles;
 public class Board extends RailroadInk {
 
 
-
+    //Written by Yinuo Zhang
     public static String[] grid = {"A0","A1","A2","A3","A4","A5","A6",
             "B0","B1","B2","B3","B4","B5","B6",
             "C0","C1","C2","C3","C4","C5","C6",
@@ -23,6 +23,7 @@ public class Board extends RailroadInk {
      * @param theLocation i.e. "A4" "D3" "G6"
      * @return the index of the location string in "grid" , which can be any integer between [0,48]
      */
+    //Written by Yinuo Zhang
     public static int findLocationIndex (String theLocation){
 
         for(int i=0; i<49; i++){
@@ -41,6 +42,7 @@ public class Board extends RailroadInk {
      * @param theLocation location string representing the grid
      * @return location string list of grids on the top, bottom, left and right(if there is any)
      */
+    //Written by Yinuo Zhang
     public static String[] getNearbyGrids (String theLocation) {
 
         int theIndex = findLocationIndex(theLocation);
@@ -104,6 +106,7 @@ public class Board extends RailroadInk {
      * @param tilePlacementStringB
      * @return if they are adjacent, return true.
      */
+    //Written by Yinuo Zhang
     public static boolean areNeighbors (String tilePlacementStringA,String tilePlacementStringB){
         String locationA = tilePlacementStringA.substring(2,4);
         String locationB = tilePlacementStringB.substring(2,4);
@@ -125,6 +128,7 @@ public class Board extends RailroadInk {
      * @return a list of five strings, recorded information of the tile in current orientation.
      *         the strings are ordered with UPLR and Centre.  e.g. {"Highway","Railway","Railway","Railway","Station"}
      */
+    //Written by Xinyu Kang
     public static String[] rotatedTileInfo (String tilePlacementString) {
         String[] info = new String[5]; //record the information for the top, right, bottom, left and centre of the rotated tile
         String tileString = tilePlacementString.substring(0,2);
@@ -187,6 +191,7 @@ public class Board extends RailroadInk {
 
 
     //Determine whether the tile is put in a position that can connect to exit
+    //Written by Xinyu Kang
     public static boolean isAtExit (String tilePlacementString){
         String[] exits = {"A1","A5","D0","D6","G1","G5","A3","B0","B6","F0","F6","G3"};
         String location = tilePlacementString.substring(2,4);
@@ -203,6 +208,7 @@ public class Board extends RailroadInk {
 
     // Determine whether the tile is connected to the exit.
     // Highway edge should connect to highway exit, and same for Railway.
+    //Written by Xinyu Kang
     public static boolean isConnectedToExit (String tilePlacementString){
 
         if(isAtExit(tilePlacementString)){
@@ -258,6 +264,7 @@ public class Board extends RailroadInk {
      *         int 2 represents thePlacement is under referencePlacement;
      *         int 3 represents thePlacement is on the left of referencePlacement;
      */
+    //Written by Xinyu Kang
     public static int relativePosition (String referencePlacement, String thePlacement){
         String referenceRow = referencePlacement.substring(2,3);
         String referenceColumn = referencePlacement.substring(3,4);
@@ -281,6 +288,7 @@ public class Board extends RailroadInk {
     }
 
     //From tilePlacementList, find whether there is at least one tile connected to the tile.
+    //Written by Xinyu Kang
     public static boolean hasConnectedNeighbors (String tilePlacementString, String[] tilePlacementList){
         for(String tilePlacement:tilePlacementList){
             if(areConnectedNeighbours(tilePlacementString,tilePlacement)){

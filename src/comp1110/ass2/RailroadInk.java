@@ -3,6 +3,8 @@ package comp1110.ass2;
 import comp1110.ass2.gui.Board;
 
 public class RailroadInk {
+
+
     /**
      * Determine whether a tile placement string is well-formed:
      * - it consists of exactly 5 characters;
@@ -15,10 +17,7 @@ public class RailroadInk {
      * @param tilePlacementString a candidate tile placement string
      * @return true if the tile placement is well formed
      */
-
-    //isTIlePlacementWellFormed was just pattern matched to assignment 1. The function uses simple if statements and
-    //as 'B' is different to 'A' and 'S,' another case was created even though apart from the 2nd character everything
-    //else is the same.
+    //Written by Elton Li
     public static boolean isTilePlacementWellFormed(String tilePlacementString) {
         // FIXME Task 2: determine whether a tile placement is well-formed
         if(tilePlacementString.length()!=5){
@@ -71,11 +70,7 @@ public class RailroadInk {
      * @return true if the board string is well-formed
      */
 
-    //isBoardStringWellFormed is far too difficult to brute force and hence uses loops to check each of the
-    //characters. The function checks for null cases first, then invalid cases with strings over 155 characters
-    //  long as well as incomplete cases using `mod` 5. A loop and array were used to scroll through the string in
-    // conjunction with isTilePlacementWellFormed to check if every 5 characters is indeed a valid tile. Special tiles
-    // are checked by looking for S and loops until there are 3 until it returns false.
+    //Written by Elton Li
     public static boolean isBoardStringWellFormed(String boardString) {
         // FIXME Task 3: determine whether a board string is well-formed
        if(boardString==null || boardString==""|| boardString.length()>155 || boardString.length()%5!=0){
@@ -107,6 +102,7 @@ public class RailroadInk {
      *
      * @return true if the placements are connected neighbours
      */
+    //Written by Yinuo Zhang
     public static boolean areConnectedNeighbours(String tilePlacementStringA, String tilePlacementStringB) {
 
         if(!Board.areNeighbors(tilePlacementStringA,tilePlacementStringB)){
@@ -152,6 +148,7 @@ public class RailroadInk {
      * @param boardString a board string representing some placement sequence
      * @return true if placement sequence is valid
      */
+    //Written by Xinyu Kang
     public static boolean isValidPlacementSequence(String boardString) {
 
         int listLength = boardString.length()/5;

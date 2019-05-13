@@ -19,6 +19,7 @@ import comp1110.ass2.RailroadInk;
  * NOTE: This class is separate from your main game class.  This
  * class does not play a game, it just illustrates various tile placements.
  */
+//Written by Xinyu Kang
 public class Viewer extends Application {
     /* board layout */
     private static final int VIEWER_WIDTH = 1024;

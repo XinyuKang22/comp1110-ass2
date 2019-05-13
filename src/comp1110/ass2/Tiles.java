@@ -1,5 +1,6 @@
 package comp1110.ass2;
 
+//Written by Xinyu Kang
 public enum Tiles {
     A0("Railway","Nothing","Nothing","Railway","Normal"),
     A1("Railway","Nothing","Railway","Nothing","Normal"),

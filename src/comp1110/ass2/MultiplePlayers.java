@@ -1,5 +1,6 @@
 package comp1110.ass2;
 
+//Written by Xinyu Kang
 public class MultiplePlayers {
 
     int round = 1;

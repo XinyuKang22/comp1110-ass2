@@ -1,5 +1,6 @@
 package comp1110.ass2;
 
+//Written by Xinyu Kang
 public class Scoring extends SoloPlayer{
 
     final String[] centreGrid = {"C2","C3","C4","D2","D3","D4","E2","E3","E4"};

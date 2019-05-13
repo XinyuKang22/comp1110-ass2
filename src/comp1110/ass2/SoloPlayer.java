@@ -1,6 +1,7 @@
 package comp1110.ass2;
 
 
+//Written by Xinyu Kang
 public class SoloPlayer extends MultiplePlayers{
 
     String boardString = "";
