@@ -10,8 +10,11 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import comp1110.ass2.RailroadInk;
+
+import static javafx.scene.paint.Color.*;
 
 /**
  * A very simple viewer for tile placements in the Railroad Ink game.
@@ -34,24 +37,125 @@ public class Viewer extends Application {
     ImageView img;
     GridPane grid;
 
+    class SpecialTile extends ImageView {
+        double x,y;
+        String tileName;
+        SpecialTile(String tileName, double x, double y){
+            this.x = x;
+            this.y = y;
+            this.tileName=tileName;
+            this.setImage(new Image(Viewer.class.getResource(URI_BASE+tileName+".png").toString()));
+            this.setFitHeight(65);
+            this.setFitWidth(65);
+            this.setLayoutX(x);
+            this.setLayoutY(y);
+            this.toFront();
+
+        }
+    }
+
+    double[] nearestGrid(double x, double y){
+        double[] nearest = new double[2];
+        double min = 65*65*2;
+        for(int[] location:gridLocation()){
+            double xSquare = (x-location[0])*(x-location[0]);
+            double ySquare = (y-location[1])*(y-location[1]);
+            if(xSquare+ySquare<min){
+                nearest[0] = location[0];
+                nearest[1] = location[1];
+                min = xSquare+ySquare;
+            }
+        }
+        if(min>=65*65*2){
+            nearest[0] = x;
+            nearest[1] = y;
+        }
+        return nearest;
+    }
+
+
+    class DraggableSpecialTile extends SpecialTile{
+        private double x,y;
+        private double mouseX, mouseY;
+        private Viewer viewer;
+        DraggableSpecialTile(String tileName, double x, double y, Viewer viewer){
+            super(tileName,x,y);
+            this.x = x;
+            this.y = y;
+            this.viewer=viewer;
+
+            this.setOnMouseDragged(event -> {
+                this.setLayoutX(this.x+ event.getSceneX() - mouseX);
+                this.setLayoutY(this.y+  event.getSceneY() - mouseY);
+            });
+            this.setOnMouseReleased(event -> {
+                double xFitted = nearestGrid(this.getLayoutX(),this.getLayoutY())[0];
+                double yFitted = nearestGrid(this.getLayoutX(),this.getLayoutY())[1];
+                this.setLayoutX(xFitted);
+                this.setLayoutY(yFitted);
+
+                double theX = this.getLayoutX();
+                double theY = this.getLayoutY();
+                double a=150;
+                double b=100;
+                double min = 65*65*2;
+                for(int[] location:gridLocation()){
+                    double xSquare = (theX-location[0])*(theX-location[0]);
+                    double ySquare = (theY-location[1])*(theY-location[1]);
+                    if(xSquare+ySquare<min){
+                        a = location[0];
+                        b = location[1];
+                        min = xSquare+ySquare;
+                    }
+                }
+                if(min<65*65*2){
+                    this.setLayoutX(a);
+                    this.setLayoutY(b);
+                }else {
+                    this.setLayoutX(x);
+                    this.setLayoutY(y);
+                }
+
+            });
+        }
+    }
+
+
+    class Grid extends Rectangle {
+        double x,y;
+        double size;
+        Grid(double x, double y, double size){
+            this.x=x;
+            this.y=y;
+            this.size=size;
+            this.setWidth(size);
+            this.setHeight(size);
+            this.setLayoutX(x);
+            this.setLayoutY(y);
+            this.setFill(BEIGE);
+            this.setStroke(BLACK);
+        }
+    }
+
+    public int[][] gridLocation(){
+        int[][] list = new int[49][2];
+        int count = 0;
+        for(int i=0; i<7; i++){
+            for(int m=0; m<7; m++){
+                list[count][0]=150+i*65;
+                list[count][1]=100+m*65;
+                count++;
+            }
+        }
+        return list;
+    }
+
     //draw a grid
     private void displayGrid() {
-        this.grid = new GridPane();
-        this.grid.setPrefSize(450,450);
-        this.grid.setLayoutX(150);
-        this.grid.setLayoutY(100);
-        root.getChildren().add(grid);
-
-        grid.setGridLinesVisible(true);
         for(int i=0; i<7; i++){
-            RowConstraints row;
-            ColumnConstraints col;
-
-            row = new RowConstraints(65);
-            col = new ColumnConstraints(65);
-
-            grid.getRowConstraints().add(row);
-            grid.getColumnConstraints().add(col);
+            for(int m=0; m<7; m++){
+                root.getChildren().add(new Grid(150+i*65,100+m*65,65));
+            }
         }
 
         //set up exits
@@ -161,6 +265,7 @@ public class Viewer extends Application {
         exitG5.setLayoutX(150+65*5);
         exitG5.setLayoutY(100+65*7);
         root.getChildren().add(exitG5);
+
     }
 
     /**
@@ -236,12 +341,20 @@ public class Viewer extends Application {
 
         controls.getChildren().add(hb);
         controls.getChildren().add(button2);
+
     }
 
     @Override
     public void start(Stage primaryStage) throws Exception {
         primaryStage.setTitle("Railroad Ink");
         Scene scene = new Scene(root, VIEWER_WIDTH,VIEWER_HEIGHT, Color.BEIGE);
+
+        root.getChildren().add(new DraggableSpecialTile("S0",700,250,this));
+        root.getChildren().add(new DraggableSpecialTile("S1",700+75,250,this));
+        root.getChildren().add(new DraggableSpecialTile("S2",700+75*2,250,this));
+        root.getChildren().add(new DraggableSpecialTile("S3",700,250+75,this));
+        root.getChildren().add(new DraggableSpecialTile("S4",700+75,250+75,this));
+        root.getChildren().add(new DraggableSpecialTile("S5",700+75*2,250+75,this));
 
         root.getChildren().add(controls);
         root.getChildren().add(placementGroup);
