@@ -83,7 +83,13 @@ public class Viewer extends Application {
             this.x = x;
             this.y = y;
             this.viewer=viewer;
-
+            this.setOnMousePressed(event -> {
+                this.mouseX = event.getSceneX();
+                this.mouseY = event.getSceneY();
+                this.x = super.getLayoutX();
+                this.y = super.getLayoutY();
+                this.toFront();
+            });
             this.setOnMouseDragged(event -> {
                 this.setLayoutX(this.x+ event.getSceneX() - mouseX);
                 this.setLayoutY(this.y+  event.getSceneY() - mouseY);
