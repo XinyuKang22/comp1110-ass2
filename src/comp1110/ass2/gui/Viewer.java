@@ -11,6 +11,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.transform.Rotate;
 import javafx.stage.Stage;
 import comp1110.ass2.RailroadInk;
 
@@ -78,11 +79,33 @@ public class Viewer extends Application {
         private double x,y;
         private double mouseX, mouseY;
         private Viewer viewer;
+        private int rotate=0;
+        private int flip =1;
+
+        void rotate(){
+            rotate=rotate+90;
+            if(rotate<=270){
+                this.setRotate(rotate);
+            }else if(rotate<=630){
+                this.setRotate(0);
+                this.setScaleX(-1);
+                this.setRotate(rotate-360);
+            }else {
+                rotate=0;
+                this.setRotate(rotate);
+                this.setScaleX(1);
+            }
+        }
+
         DraggableSpecialTile(String tileName, double x, double y, Viewer viewer){
             super(tileName,x,y);
             this.x = x;
             this.y = y;
             this.viewer=viewer;
+
+            this.setOnScroll(event -> {
+                this.rotate();
+            });
             this.setOnMousePressed(event -> {
                 this.mouseX = event.getSceneX();
                 this.mouseY = event.getSceneY();
