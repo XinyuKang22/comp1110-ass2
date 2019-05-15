@@ -1,5 +1,7 @@
 package comp1110.ass2.gui;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.scene.Group;
 import javafx.scene.Scene;
@@ -11,9 +13,12 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
-import javafx.scene.transform.Rotate;
 import javafx.stage.Stage;
 import comp1110.ass2.RailroadInk;
+import javafx.util.Duration;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
 
 import static javafx.scene.paint.Color.*;
 
@@ -25,23 +30,274 @@ import static javafx.scene.paint.Color.*;
  */
 //Written by Xinyu Kang
 public class Viewer extends Application {
-    /* board layout */
+
     private static final int VIEWER_WIDTH = 1024;
     private static final int VIEWER_HEIGHT = 640;
-
     private static final String URI_BASE = "assets/";
-
+    //private final Timeline timeline1 = new Timeline();
     private final Group root = new Group();
+    private final Group begin = new Group();
+    private final Group board = new Group();
     private final Group controls = new Group();
+    private final Group special = new Group();
     private final Group placementGroup =new Group();
-    TextField textField =new TextField();
-    ImageView img;
-    GridPane grid;
+    private final Group dice =new Group();
+    private final Group stillImage = new Group();
+    private Iterator<Image> imageIterator;
+    private final ImageView imageView1 = new ImageView();
+    private final ImageView imageView2 = new ImageView();
+    private final ImageView imageView3 = new ImageView();
+    private final ImageView imageView4 = new ImageView();
+    //private ArrayList<ImageView> imageViews =new ArrayList<>();
 
-    class SpecialTile extends ImageView {
+
+
+    @Override
+    public void start(Stage primaryStage) throws Exception {
+        primaryStage.setTitle("Railroad Ink");
+        Scene scene = new Scene(root, VIEWER_WIDTH,VIEWER_HEIGHT, Color.BEIGE);
+
+        root.getChildren().add(board);
+        root.getChildren().add(controls);
+        root.getChildren().add(placementGroup);
+        root.getChildren().add(special);
+        root.getChildren().add(stillImage);
+        root.getChildren().add(dice);
+        root.getChildren().add(begin);
+
+
+        displayBeginPage();
+
+        primaryStage.setScene(scene);
+        primaryStage.show();
+    }
+
+
+    ImageView diceBRolling(ImageView imageView){
+        ArrayList<Image> tileB = new ArrayList<>();
+        tileB.add(new Image(Viewer.class.getResource(URI_BASE+"B0.png").toString()));
+        tileB.add(new Image(Viewer.class.getResource(URI_BASE+"B1.png").toString()));
+        tileB.add(new Image(Viewer.class.getResource(URI_BASE+"B2.png").toString()));
+        Collections.shuffle(tileB);
+        imageIterator = tileB.iterator();
+        Timeline timeline = new Timeline(
+                new KeyFrame(
+                        Duration.ZERO,
+                        e -> {
+                            if(imageIterator.hasNext()) {
+                                imageView.setImage(imageIterator.next());
+                            }
+                        }
+                ),
+                new KeyFrame(Duration.millis(100)));
+        timeline.setOnFinished(event -> {
+            Collections.shuffle(tileB);
+            imageIterator = tileB.iterator();
+            timeline.playFromStart();
+        });
+        timeline.play();
+        imageView.setFitHeight(65);
+        imageView.setFitWidth(65);
+        return imageView;
+    }
+
+    ImageView diceARolling(ImageView imageView){
+        ArrayList<Image> tileA = new ArrayList<>();
+        tileA.add(new Image(Viewer.class.getResource(URI_BASE+"A0.png").toString()));
+        tileA.add(new Image(Viewer.class.getResource(URI_BASE+"A1.png").toString()));
+        tileA.add(new Image(Viewer.class.getResource(URI_BASE+"A2.png").toString()));
+        tileA.add(new Image(Viewer.class.getResource(URI_BASE+"A3.png").toString()));
+        tileA.add(new Image(Viewer.class.getResource(URI_BASE+"A4.png").toString()));
+        tileA.add(new Image(Viewer.class.getResource(URI_BASE+"A5.png").toString()));
+        Collections.shuffle(tileA);
+
+        imageIterator= tileA.iterator();
+        Timeline timeline = new Timeline(
+                new KeyFrame(
+                        Duration.ZERO,
+                        e -> {
+                            if(imageIterator.hasNext()){
+                                imageView.setImage(imageIterator.next());
+                            }
+                        }
+                ),
+                new KeyFrame(Duration.millis(100)));
+        //timeline.setCycleCount(tileA.size());
+        timeline.setOnFinished(event -> {
+            Collections.shuffle(tileA);
+            imageIterator = tileA.iterator();
+            timeline.playFromStart();
+        });
+        timeline.play();
+        imageView.setFitHeight(65);
+        imageView.setFitWidth(65);
+        return imageView;
+       }
+
+
+    /**
+     * Draw a placement in the window, removing any previously drawn one
+     *
+     * @param placement A valid placement string
+     */
+    void makePlacement(String placement) {
+        if(!RailroadInk.isBoardStringWellFormed(placement)){
+            throw new IllegalArgumentException("Illegal Board String");
+        }
+       for(int i=0; i<placement.length(); i+=5){
+
+           String tile = placement.substring(i,i+2);
+           int rowPosition = (placement.substring(i+2,i+3).hashCode()-65)*65+100;
+           int colPosition = Integer.parseInt(placement.substring(i+3,i+4))*65+150;
+           int orientation = Integer.parseInt(placement.substring(i+4,i+5));
+           int angle;
+           if(orientation<4){
+               angle = orientation*90;
+           }else {
+               angle = (orientation-4)*90;
+           }
+
+           ImageView img = new ImageView();
+           img.setImage(new Image(Viewer.class.getResource(URI_BASE+tile+".png").toString()));
+           img.setRotate(angle);
+           if(orientation>=4){
+               img.setScaleX(-1);
+           }
+           img.setFitWidth(65);
+           img.setFitHeight(65);
+           img.setPreserveRatio(true);
+           img.setSmooth(true);
+           HBox hBox = new HBox();
+           hBox.getChildren().add(img);
+           placementGroup.getChildren().add(hBox);
+           hBox.setLayoutX(colPosition);
+           hBox.setLayoutY(rowPosition);
+       }
+    }
+
+
+    /**
+     * Create a basic text field for input and a refresh button.
+     */
+    private void inputArea() {
+
+        Label label1 = new Label("Placement String:");
+        TextField textField = new TextField();
+        textField.setPrefWidth(100);
+        textField.setPrefColumnCount(3);
+        Button button1 = new Button("Make Placement");
+        button1.setOnAction(e -> {
+            makePlacement(textField.getText());
+            textField.clear();
+        });
+        Button button2 = new Button("Clear");
+        button2.setOnAction(e ->{
+            placementGroup.getChildren().clear();
+
+        });
+        button2.setLayoutX(880);
+        button2.setLayoutY(180);
+
+
+        HBox hb = new HBox();
+        hb.getChildren().addAll(label1, textField, button1);
+        hb.setSpacing(10);
+        hb.setLayoutX(660);
+        hb.setLayoutY(150);
+
+        controls.getChildren().add(hb);
+        controls.getChildren().add(button2);
+    }
+
+    void displayTiles(){
+        special.getChildren().add(new DraggableTile("S0",700,150,this));
+        special.getChildren().add(new DraggableTile("S1",700+75,150,this));
+        special.getChildren().add(new DraggableTile("S2",700+75*2,150,this));
+        special.getChildren().add(new DraggableTile("S3",700,150+75,this));
+        special.getChildren().add(new DraggableTile("S4",700+75,150+75,this));
+        special.getChildren().add(new DraggableTile("S5",700+75*2,150+75,this));
+
+        ImageView tileA0 = new ImageView(Viewer.class.getResource(URI_BASE+"A0.png").toString());
+        tileA0.setFitWidth(65);
+        tileA0.setFitHeight(65);
+        tileA0.setLayoutX(700);
+        tileA0.setLayoutY(400);
+        ImageView tileA1 = new ImageView(Viewer.class.getResource(URI_BASE+"A1.png").toString());
+        tileA1.setFitWidth(65);
+        tileA1.setFitHeight(65);
+        tileA1.setLayoutX(700+75);
+        tileA1.setLayoutY(400);
+        ImageView tileA2 = new ImageView(Viewer.class.getResource(URI_BASE+"A2.png").toString());
+        tileA2.setFitWidth(65);
+        tileA2.setFitHeight(65);
+        tileA2.setLayoutX(700+75*2);
+        tileA2.setLayoutY(400);
+        ImageView tileB0 = new ImageView(Viewer.class.getResource(URI_BASE+"B0.png").toString());
+        tileB0.setFitWidth(65);
+        tileB0.setFitHeight(65);
+        tileB0.setLayoutX(700+75*3);
+        tileB0.setLayoutY(400);
+        stillImage.getChildren().addAll(tileA0,tileA1,tileA2,tileB0);
+
+        imageView1.setLayoutX(700);
+        imageView1.setLayoutY(400);
+        imageView2.setLayoutX(700+75);
+        imageView2.setLayoutY(400);
+        imageView3.setLayoutX(700+75*2);
+        imageView3.setLayoutY(400);
+        imageView4.setLayoutX(700+75*3);
+        imageView4.setLayoutY(400);
+
+        Button roll = new Button("Roll");
+        roll.setLayoutX(750);
+        roll.setLayoutY(500);
+        Button stop = new Button("Stop");
+        stop.setLayoutX(750+75*2);
+        stop.setLayoutY(500);
+        roll.setOnMousePressed(event -> {
+            stillImage.getChildren().clear();
+            dice.getChildren().add(diceARolling(imageView1));
+            dice.getChildren().add(diceARolling(imageView2));
+            dice.getChildren().add(diceARolling(imageView3));
+            dice.getChildren().add(diceBRolling(imageView4));
+        });
+        stop.setOnMousePressed(event -> {
+            dice.getChildren().clear();
+        });
+
+        special.getChildren().addAll(roll,stop);
+    }
+
+    void displayBeginPage(){
+        Button start  = new Button("Start Game");
+        start.setLayoutX(VIEWER_WIDTH/2-100);
+        start.setLayoutY(VIEWER_HEIGHT/2);
+        start.setOnMousePressed(event ->{
+            displayTiles();
+            displayBoard();
+            begin.getChildren().clear();
+        });
+
+        Button view = new Button("Placement Viewer");
+        view.setLayoutX(VIEWER_WIDTH/2+100);
+        view.setLayoutY(VIEWER_HEIGHT/2);
+        view.setOnMousePressed(event ->{
+            inputArea();
+            displayBoard();
+            begin.getChildren().clear();
+        });
+
+        begin.getChildren().add(start);
+        begin.getChildren().add(view);
+
+    }
+
+
+
+    class Tile extends ImageView {
         double x,y;
         String tileName;
-        SpecialTile(String tileName, double x, double y){
+        Tile(String tileName, double x, double y){
             this.x = x;
             this.y = y;
             this.tileName=tileName;
@@ -55,27 +311,7 @@ public class Viewer extends Application {
         }
     }
 
-    double[] nearestGrid(double x, double y){
-        double[] nearest = new double[2];
-        double min = 65*65*2;
-        for(int[] location:gridLocation()){
-            double xSquare = (x-location[0])*(x-location[0]);
-            double ySquare = (y-location[1])*(y-location[1]);
-            if(xSquare+ySquare<min){
-                nearest[0] = location[0];
-                nearest[1] = location[1];
-                min = xSquare+ySquare;
-            }
-        }
-        if(min>=65*65*2){
-            nearest[0] = x;
-            nearest[1] = y;
-        }
-        return nearest;
-    }
-
-
-    class DraggableSpecialTile extends SpecialTile{
+    class DraggableTile extends Tile {
         private double x,y;
         private double mouseX, mouseY;
         private Viewer viewer;
@@ -97,7 +333,7 @@ public class Viewer extends Application {
             }
         }
 
-        DraggableSpecialTile(String tileName, double x, double y, Viewer viewer){
+        DraggableTile(String tileName, double x, double y, Viewer viewer){
             super(tileName,x,y);
             this.x = x;
             this.y = y;
@@ -149,6 +385,37 @@ public class Viewer extends Application {
         }
     }
 
+    double[] nearestGrid(double x, double y){
+        double[] nearest = new double[2];
+        double min = 65*65*2;
+        for(int[] location:gridLocation()){
+            double xSquare = (x-location[0])*(x-location[0]);
+            double ySquare = (y-location[1])*(y-location[1]);
+            if(xSquare+ySquare<min){
+                nearest[0] = location[0];
+                nearest[1] = location[1];
+                min = xSquare+ySquare;
+            }
+        }
+        if(min>=65*65*2){
+            nearest[0] = x;
+            nearest[1] = y;
+        }
+        return nearest;
+    }
+
+    public int[][] gridLocation(){
+        int[][] list = new int[49][2];
+        int count = 0;
+        for(int i=0; i<7; i++){
+            for(int m=0; m<7; m++){
+                list[count][0]=150+i*65;
+                list[count][1]=100+m*65;
+                count++;
+            }
+        }
+        return list;
+    }
 
     class Grid extends Rectangle {
         double x,y;
@@ -166,28 +433,24 @@ public class Viewer extends Application {
         }
     }
 
-    public int[][] gridLocation(){
-        int[][] list = new int[49][2];
-        int count = 0;
+    private void displayBoard() {
         for(int i=0; i<7; i++){
             for(int m=0; m<7; m++){
-                list[count][0]=150+i*65;
-                list[count][1]=100+m*65;
-                count++;
-            }
-        }
-        return list;
-    }
-
-    //draw a grid
-    private void displayGrid() {
-        for(int i=0; i<7; i++){
-            for(int m=0; m<7; m++){
-                root.getChildren().add(new Grid(150+i*65,100+m*65,65));
+                board.getChildren().add(new Grid(150+i*65,100+m*65,65));
             }
         }
 
-        //set up exits
+        Button back = new Button("Back");
+        back.setOnMousePressed(e -> {
+            controls.getChildren().clear();
+            placementGroup.getChildren().clear();
+            board.getChildren().clear();
+            special.getChildren().clear();
+            dice.getChildren().clear();
+            displayBeginPage();
+        });
+        board.getChildren().add(back);
+
         ImageView exitB0 = new ImageView();
         exitB0.setImage(new Image(Viewer.class.getResource(URI_BASE+"RailExit.png").toString()));
         exitB0.setFitHeight(65);
@@ -195,7 +458,7 @@ public class Viewer extends Application {
         exitB0.setLayoutX(150-65);
         exitB0.setLayoutY(100+65);
         exitB0.setRotate(270);
-        root.getChildren().add(exitB0);
+        board.getChildren().add(exitB0);
 
         ImageView exitD0 = new ImageView();
         exitD0.setImage(new Image(Viewer.class.getResource(URI_BASE+"HighExit.png").toString()));
@@ -204,7 +467,7 @@ public class Viewer extends Application {
         exitD0.setLayoutX(150-65);
         exitD0.setLayoutY(100+65*3);
         exitD0.setRotate(270);
-        root.getChildren().add(exitD0);
+        board.getChildren().add(exitD0);
 
         ImageView exitF0 = new ImageView();
         exitF0.setImage(new Image(Viewer.class.getResource(URI_BASE+"RailExit.png").toString()));
@@ -213,7 +476,7 @@ public class Viewer extends Application {
         exitF0.setLayoutX(150-65);
         exitF0.setLayoutY(100+65*5);
         exitF0.setRotate(270);
-        root.getChildren().add(exitF0);
+        board.getChildren().add(exitF0);
 
         ImageView exitB6 = new ImageView();
         exitB6.setImage(new Image(Viewer.class.getResource(URI_BASE+"RailExit.png").toString()));
@@ -222,9 +485,7 @@ public class Viewer extends Application {
         exitB6.setLayoutX(150+65*7);
         exitB6.setLayoutY(100+65);
         exitB6.setRotate(90);
-
-
-        root.getChildren().add(exitB6);
+        board.getChildren().add(exitB6);
 
         ImageView exitD6 = new ImageView();
         exitD6.setImage(new Image(Viewer.class.getResource(URI_BASE+"HighExit.png").toString()));
@@ -233,7 +494,7 @@ public class Viewer extends Application {
         exitD6.setLayoutX(150+65*7);
         exitD6.setLayoutY(100+65*3);
         exitD6.setRotate(90);
-        root.getChildren().add(exitD6);
+        board.getChildren().add(exitD6);
 
         ImageView exitF6 = new ImageView();
         exitF6.setImage(new Image(Viewer.class.getResource(URI_BASE+"RailExit.png").toString()));
@@ -242,7 +503,7 @@ public class Viewer extends Application {
         exitF6.setLayoutX(150+65*7);
         exitF6.setLayoutY(100+65*5);
         exitF6.setRotate(90);
-        root.getChildren().add(exitF6);
+        board.getChildren().add(exitF6);
 
         ImageView exitA1 = new ImageView();
         exitA1.setImage(new Image(Viewer.class.getResource(URI_BASE+"HighExit.png").toString()));
@@ -250,7 +511,7 @@ public class Viewer extends Application {
         exitA1.setFitWidth(65);
         exitA1.setLayoutX(150+65);
         exitA1.setLayoutY(100-65);
-        root.getChildren().add(exitA1);
+        board.getChildren().add(exitA1);
 
         ImageView exitA3 = new ImageView();
         exitA3.setImage(new Image(Viewer.class.getResource(URI_BASE+"RailExit.png").toString()));
@@ -258,7 +519,7 @@ public class Viewer extends Application {
         exitA3.setFitWidth(65);
         exitA3.setLayoutX(150+65*3);
         exitA3.setLayoutY(100-65);
-        root.getChildren().add(exitA3);
+        board.getChildren().add(exitA3);
 
         ImageView exitA5 = new ImageView();
         exitA5.setImage(new Image(Viewer.class.getResource(URI_BASE+"HighExit.png").toString()));
@@ -266,7 +527,7 @@ public class Viewer extends Application {
         exitA5.setFitWidth(65);
         exitA5.setLayoutX(150+65*5);
         exitA5.setLayoutY(100-65);
-        root.getChildren().add(exitA5);
+        board.getChildren().add(exitA5);
 
         ImageView exitG1 = new ImageView();
         exitG1.setImage(new Image(Viewer.class.getResource(URI_BASE+"HighExit.png").toString()));
@@ -275,7 +536,7 @@ public class Viewer extends Application {
         exitG1.setFitWidth(65);
         exitG1.setLayoutX(150+65);
         exitG1.setLayoutY(100+65*7);
-        root.getChildren().add(exitG1);
+        board.getChildren().add(exitG1);
 
         ImageView exitG3 = new ImageView();
         exitG3.setImage(new Image(Viewer.class.getResource(URI_BASE+"RailExit.png").toString()));
@@ -284,7 +545,7 @@ public class Viewer extends Application {
         exitG3.setFitWidth(65);
         exitG3.setLayoutX(150+65*3);
         exitG3.setLayoutY(100+65*7);
-        root.getChildren().add(exitG3);
+        board.getChildren().add(exitG3);
 
         ImageView exitG5 = new ImageView();
         exitG5.setImage(new Image(Viewer.class.getResource(URI_BASE+"HighExit.png").toString()));
@@ -293,106 +554,8 @@ public class Viewer extends Application {
         exitG5.setFitWidth(65);
         exitG5.setLayoutX(150+65*5);
         exitG5.setLayoutY(100+65*7);
-        root.getChildren().add(exitG5);
+        board.getChildren().add(exitG5);
 
-    }
-
-    /**
-     * Draw a placement in the window, removing any previously drawn one
-     *
-     * @param placement A valid placement string
-     */
-    void makePlacement(String placement) {
-        // FIXME Task 4: implement the simple placement viewer
-
-        if(!RailroadInk.isBoardStringWellFormed(placement)){
-            throw new IllegalArgumentException("Illegal Board String");
-        }
-
-       for(int i=0; i<placement.length(); i+=5){
-
-           String tile = placement.substring(i,i+2);
-           int rowPosition = (placement.substring(i+2,i+3).hashCode()-65)*65+100;
-           int colPosition = Integer.parseInt(placement.substring(i+3,i+4))*65+150;
-           int orientation = Integer.parseInt(placement.substring(i+4,i+5));
-           int angle;
-           if(orientation<4){
-               angle = orientation*90;
-           }else {
-               angle = (orientation-4)*90;
-           }
-
-           //set up tile
-           img = new ImageView();
-           img.setImage(new Image(Viewer.class.getResource(URI_BASE+tile+".png").toString()));
-           img.setRotate(angle);
-           if(orientation>=4){
-               img.setScaleX(-1);
-           }
-           img.setFitWidth(65);
-           img.setFitHeight(65);
-           img.setPreserveRatio(true);
-           img.setSmooth(true);
-
-           HBox hBox = new HBox();
-           hBox.getChildren().add(img);
-           placementGroup.getChildren().add(hBox);
-           hBox.setLayoutX(colPosition);
-           hBox.setLayoutY(rowPosition);
-       }
-    }
-
-    /**
-     * Create a basic text field for input and a refresh button.
-     */
-    private void makeControls() {
-
-        Label label1 = new Label("Placement String:");
-        textField.setPrefWidth(100);
-        textField.setPrefColumnCount(3);
-        Button button1 = new Button("Make Placement");
-        button1.setOnAction(e -> {
-            makePlacement(textField.getText());
-            textField.clear();
-        });
-        Button button2 = new Button("Clear");
-        button2.setOnAction(e ->{
-            placementGroup.getChildren().clear();
-
-        });
-        button2.setLayoutX(880);
-        button2.setLayoutY(180);
-        HBox hb = new HBox();
-        hb.getChildren().addAll(label1, textField, button1);
-        hb.setSpacing(10);
-        hb.setLayoutX(660);
-        hb.setLayoutY(150);
-
-        controls.getChildren().add(hb);
-        controls.getChildren().add(button2);
-
-    }
-
-    @Override
-    public void start(Stage primaryStage) throws Exception {
-        primaryStage.setTitle("Railroad Ink");
-        Scene scene = new Scene(root, VIEWER_WIDTH,VIEWER_HEIGHT, Color.BEIGE);
-
-        root.getChildren().add(new DraggableSpecialTile("S0",700,250,this));
-        root.getChildren().add(new DraggableSpecialTile("S1",700+75,250,this));
-        root.getChildren().add(new DraggableSpecialTile("S2",700+75*2,250,this));
-        root.getChildren().add(new DraggableSpecialTile("S3",700,250+75,this));
-        root.getChildren().add(new DraggableSpecialTile("S4",700+75,250+75,this));
-        root.getChildren().add(new DraggableSpecialTile("S5",700+75*2,250+75,this));
-
-        root.getChildren().add(controls);
-        root.getChildren().add(placementGroup);
-
-        makeControls();
-        displayGrid();
-
-        primaryStage.setScene(scene);
-        primaryStage.show();
     }
 
 }
