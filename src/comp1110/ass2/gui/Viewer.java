@@ -44,10 +44,7 @@ public class Viewer extends Application {
     private final Group dice =new Group();
     private final Group stillImage = new Group();
     private Iterator<Image> imageIterator;
-    private final ImageView imageView1 = new ImageView();
-    private final ImageView imageView2 = new ImageView();
-    private final ImageView imageView3 = new ImageView();
-    private final ImageView imageView4 = new ImageView();
+
     //private ArrayList<ImageView> imageViews =new ArrayList<>();
 
 
@@ -217,37 +214,106 @@ public class Viewer extends Application {
         special.getChildren().add(new DraggableTile("S4",700+75,150+75,this));
         special.getChildren().add(new DraggableTile("S5",700+75*2,150+75,this));
 
-        ImageView tileA0 = new ImageView(Viewer.class.getResource(URI_BASE+"A0.png").toString());
-        tileA0.setFitWidth(65);
-        tileA0.setFitHeight(65);
-        tileA0.setLayoutX(700);
-        tileA0.setLayoutY(400);
-        ImageView tileA1 = new ImageView(Viewer.class.getResource(URI_BASE+"A1.png").toString());
-        tileA1.setFitWidth(65);
-        tileA1.setFitHeight(65);
-        tileA1.setLayoutX(700+75);
-        tileA1.setLayoutY(400);
-        ImageView tileA2 = new ImageView(Viewer.class.getResource(URI_BASE+"A2.png").toString());
-        tileA2.setFitWidth(65);
-        tileA2.setFitHeight(65);
-        tileA2.setLayoutX(700+75*2);
-        tileA2.setLayoutY(400);
-        ImageView tileB0 = new ImageView(Viewer.class.getResource(URI_BASE+"B0.png").toString());
-        tileB0.setFitWidth(65);
-        tileB0.setFitHeight(65);
-        tileB0.setLayoutX(700+75*3);
-        tileB0.setLayoutY(400);
-        stillImage.getChildren().addAll(tileA0,tileA1,tileA2,tileB0);
+        ImageView blank1 = new ImageView(Viewer.class.getResource(URI_BASE+"QuestionMark.jpg").toString());
+        blank1.setFitHeight(65);
+        blank1.setFitWidth(65);
+        blank1.setLayoutX(700);
+        blank1.setLayoutY(400);
+        ImageView blank2 = new ImageView(Viewer.class.getResource(URI_BASE+"QuestionMark.jpg").toString());
+        blank2.setFitHeight(65);
+        blank2.setFitWidth(65);
+        blank2.setLayoutX(700+75);
+        blank2.setLayoutY(400);
+        ImageView blank3 = new ImageView(Viewer.class.getResource(URI_BASE+"QuestionMark.jpg").toString());
+        blank3.setFitHeight(65);
+        blank3.setFitWidth(65);
+        blank3.setLayoutX(700+75*2);
+        blank3.setLayoutY(400);
+        ImageView blank4 = new ImageView(Viewer.class.getResource(URI_BASE+"QuestionMark.jpg").toString());
+        blank4.setFitHeight(65);
+        blank4.setFitWidth(65);
+        blank4.setLayoutX(700+75*3);
+        blank4.setLayoutY(400);
+        stillImage.getChildren().addAll(blank1,blank2,blank3,blank4);
+
+        Rectangle rectangle1 = new Rectangle();
+        rectangle1.setHeight(10);
+        rectangle1.setWidth(75*4+10);
+        rectangle1.setX(700-10);
+        rectangle1.setY(400-10);
+        //rectangle1.setFill(DARKGRAY);
+
+        Rectangle rectangle2 = new Rectangle();
+        rectangle2.setHeight(10);
+        rectangle2.setWidth(75*4+10);
+        rectangle2.setX(700-10);
+        rectangle2.setY(400+65);
+        //rectangle2.setFill(DARKGRAY);
+
+        Rectangle rectangle3 = new Rectangle();
+        rectangle3.setHeight(65+20);
+        rectangle3.setWidth(10);
+        rectangle3.setX(700-10);
+        rectangle3.setY(400-10);
+        //rectangle3.setFill(DARKGRAY);
+
+        Rectangle rectangle4 = new Rectangle();
+        rectangle4.setHeight(65+20);
+        rectangle4.setWidth(10);
+        rectangle4.setX(700+65);
+        rectangle4.setY(400-10);
+        //rectangle4.setFill(DARKGRAY);
+
+        Rectangle rectangle5 = new Rectangle();
+        rectangle5.setHeight(65+20);
+        rectangle5.setWidth(10);
+        rectangle5.setX(700+75*2-10);
+        rectangle5.setY(400-10);
+        //rectangle5.setFill(DARKGRAY);
+
+        Rectangle rectangle6 = new Rectangle();
+        rectangle6.setHeight(65+20);
+        rectangle6.setWidth(10);
+        rectangle6.setX(700+75*3-10);
+        rectangle6.setY(400-10);
+        //rectangle6.setFill(DARKGRAY);
+
+        Rectangle rectangle7 = new Rectangle();
+        rectangle7.setHeight(65+20);
+        rectangle7.setWidth(10);
+        rectangle7.setX(700+75*4-10);
+        rectangle7.setY(400-10);
+        //rectangle7.setFill(DARKGRAY);
+
+        special.getChildren().addAll(rectangle1,rectangle2,rectangle3,rectangle4,rectangle5,rectangle6,rectangle7);
+
+        ImageView imageView1 = new ImageView(Viewer.class.getResource(URI_BASE+"dieA.gif").toString());
+        ImageView imageView2 = new ImageView(Viewer.class.getResource(URI_BASE+"dieA.gif").toString());
+        ImageView imageView3 = new ImageView(Viewer.class.getResource(URI_BASE+"dieA.gif").toString());
+        ImageView imageView4 = new ImageView(Viewer.class.getResource(URI_BASE+"dieA.gif").toString());
 
         imageView1.setLayoutX(700);
         imageView1.setLayoutY(400);
+        imageView1.setFitWidth(65);
+        imageView1.setFitHeight(65);
+        imageView1.setScaleX(-1);
         imageView2.setLayoutX(700+75);
         imageView2.setLayoutY(400);
+        imageView2.setFitWidth(65);
+        imageView2.setFitHeight(65);
+        imageView2.setScaleY(-1);
         imageView3.setLayoutX(700+75*2);
         imageView3.setLayoutY(400);
-        imageView4.setLayoutX(700+75*3);
-        imageView4.setLayoutY(400);
+        imageView3.setFitWidth(65);
+        imageView3.setFitHeight(65);
+        imageView3.setScaleX(-1);
+        imageView3.setScaleY(-1);
+        imageView4.setLayoutX(700+75*3+5);
+        imageView4.setLayoutY(400+5);
+        imageView4.setFitWidth(55);
+        imageView4.setFitHeight(55);
 
+        //imageView1=new ImageView(Viewer.class.getResource(URI_BASE+"B0.png").toString());
         Button roll = new Button("Roll");
         roll.setLayoutX(750);
         roll.setLayoutY(500);
@@ -256,14 +322,17 @@ public class Viewer extends Application {
         stop.setLayoutY(500);
         roll.setOnMousePressed(event -> {
             stillImage.getChildren().clear();
-            dice.getChildren().add(diceARolling(imageView1));
-            dice.getChildren().add(diceARolling(imageView2));
-            dice.getChildren().add(diceARolling(imageView3));
-            dice.getChildren().add(diceBRolling(imageView4));
+            dice.getChildren().add(imageView1);
+            dice.getChildren().add(imageView2);
+            dice.getChildren().add(imageView3);
+            dice.getChildren().add(imageView4);
         });
         stop.setOnMousePressed(event -> {
             dice.getChildren().clear();
+            stillImage.getChildren().addAll(blank1,blank2,blank3,blank4);
         });
+
+
 
         special.getChildren().addAll(roll,stop);
     }
