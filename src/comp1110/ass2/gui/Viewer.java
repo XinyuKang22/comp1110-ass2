@@ -1,5 +1,7 @@
 package comp1110.ass2.gui;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.scene.Group;
 import javafx.scene.Scene;
@@ -13,9 +15,12 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import comp1110.ass2.RailroadInk;
+import javafx.util.Duration;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 
 import static javafx.scene.paint.Color.*;
 
@@ -38,10 +43,19 @@ public class Viewer extends Application {
     private final Group special = new Group();
     private final Group placementGroup =new Group();
     private final Group dice =new Group();
-    private final Group stillImage = new Group();
+    private final Group roundButton = new Group();
+    private final Group tile = new Group();
+    private final Group alert = new Group();
+    //private final Group stillImage = new Group();
     private final Group stringShow = new Group();
-    private Iterator<Image> imageIterator;
-
+    private final Group round = new Group();
+    //private Iterator<Image> imageIterator;
+    private int roundNum = 1;
+    String boardString = "";
+    private DraggableTile tileA1;
+    private DraggableTile tileA2;
+    private DraggableTile tileA3;
+    private DraggableTile tileB;
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -51,7 +65,11 @@ public class Viewer extends Application {
         root.getChildren().add(controls);
         root.getChildren().add(placementGroup);
         root.getChildren().add(special);
-        root.getChildren().add(stillImage);
+        root.getChildren().add(round);
+        root.getChildren().add(roundButton);
+        root.getChildren().add(tile);
+        root.getChildren().add(alert);
+        //root.getChildren().add(stillImage);
         root.getChildren().add(dice);
         root.getChildren().add(begin);
         root.getChildren().add(stringShow);
@@ -101,6 +119,28 @@ public class Viewer extends Application {
        }
     }
 
+    private void startRound(){
+        ImageView imageView = new ImageView();
+        Image theRound = new Image(Viewer.class.getResource(URI_BASE+"round"+roundNum+".png").toString());
+        //round.getChildren().add(theRound);
+        Timeline timeline = new Timeline(   new KeyFrame(
+                Duration.ZERO,
+                e -> {imageView.setImage(theRound);
+                imageView.setFitHeight(300);
+                imageView.setFitWidth(700);
+                imageView.setLayoutX(150);
+                imageView.setLayoutY(110);}
+        ),
+                new KeyFrame(Duration.millis(2000)));
+        timeline.setOnFinished(e -> round.getChildren().clear());
+        timeline.play();
+        round.getChildren().add(imageView);
+
+        Button roundReminder = new Button("Round: "+roundNum);
+        roundReminder.setLayoutX(800);
+        roundReminder.setLayoutY(20);
+        roundButton.getChildren().add(roundReminder);
+    }
 
     /**
      * Create a basic text field for input and a refresh button.
@@ -148,28 +188,6 @@ public class Viewer extends Application {
         special.getChildren().add(new DraggableTile("S3",700,150+75,this));
         special.getChildren().add(new DraggableTile("S4",700+75,150+75,this));
         special.getChildren().add(new DraggableTile("S5",700+75*2,150+75,this));
-
-        ImageView blank1 = new ImageView(Viewer.class.getResource(URI_BASE+"QuestionMark.jpg").toString());
-        blank1.setFitHeight(65);
-        blank1.setFitWidth(65);
-        blank1.setLayoutX(700);
-        blank1.setLayoutY(400);
-        ImageView blank2 = new ImageView(Viewer.class.getResource(URI_BASE+"QuestionMark.jpg").toString());
-        blank2.setFitHeight(65);
-        blank2.setFitWidth(65);
-        blank2.setLayoutX(700+75);
-        blank2.setLayoutY(400);
-        ImageView blank3 = new ImageView(Viewer.class.getResource(URI_BASE+"QuestionMark.jpg").toString());
-        blank3.setFitHeight(65);
-        blank3.setFitWidth(65);
-        blank3.setLayoutX(700+75*2);
-        blank3.setLayoutY(400);
-        ImageView blank4 = new ImageView(Viewer.class.getResource(URI_BASE+"QuestionMark.jpg").toString());
-        blank4.setFitHeight(65);
-        blank4.setFitWidth(65);
-        blank4.setLayoutX(700+75*3);
-        blank4.setLayoutY(400);
-        stillImage.getChildren().addAll(blank1,blank2,blank3,blank4);
 
         Rectangle rectangle1 = new Rectangle();
         rectangle1.setHeight(10);
@@ -248,7 +266,8 @@ public class Viewer extends Application {
         stop.setLayoutX(750+75*2);
         stop.setLayoutY(500);
         roll.setOnMousePressed(event -> {
-            stillImage.getChildren().clear();
+            //stillImage.getChildren().clear();
+            //dice.getChildren().clear();
             dice.getChildren().add(imageView1);
             dice.getChildren().add(imageView2);
             dice.getChildren().add(imageView3);
@@ -256,9 +275,42 @@ public class Viewer extends Application {
         });
         stop.setOnMousePressed(event -> {
             dice.getChildren().clear();
-            stillImage.getChildren().addAll(blank1,blank2,blank3,blank4);
+            //stillImage.getChildren().addAll(blank1,blank2,blank3,blank4);
+            String diceResult = RailroadInk.generateDiceRoll();
+            tileA1 = new DraggableTile(diceResult.substring(0,2),700,400,this);
+            tileA2 = new DraggableTile(diceResult.substring(2,4),700+75,400,this);
+            tileA3 = new DraggableTile(diceResult.substring(4,6),700+75*2,400,this);
+            tileB = new DraggableTile(diceResult.substring(6),700+75*3,400,this);
+
+            tile.getChildren().add(tileA1);
+            tile.getChildren().add(tileA2);
+            tile.getChildren().add(tileA3);
+            tile.getChildren().add(tileB);
         });
         special.getChildren().addAll(roll,stop);
+        /*
+        ImageView blank1 = new ImageView(Viewer.class.getResource(URI_BASE+"QuestionMark.jpg").toString());
+        blank1.setFitHeight(65);
+        blank1.setFitWidth(65);
+        blank1.setLayoutX(700);
+        blank1.setLayoutY(400);
+        ImageView blank2 = new ImageView(Viewer.class.getResource(URI_BASE+"QuestionMark.jpg").toString());
+        blank2.setFitHeight(65);
+        blank2.setFitWidth(65);
+        blank2.setLayoutX(700+75);
+        blank2.setLayoutY(400);
+        ImageView blank3 = new ImageView(Viewer.class.getResource(URI_BASE+"QuestionMark.jpg").toString());
+        blank3.setFitHeight(65);
+        blank3.setFitWidth(65);
+        blank3.setLayoutX(700+75*2);
+        blank3.setLayoutY(400);
+        ImageView blank4 = new ImageView(Viewer.class.getResource(URI_BASE+"QuestionMark.jpg").toString());
+        blank4.setFitHeight(65);
+        blank4.setFitWidth(65);
+        blank4.setLayoutX(700+75*3);
+        blank4.setLayoutY(400);
+        stillImage.getChildren().addAll(blank1,blank2,blank3,blank4);
+        */
     }
 
     void displayBeginPage(){
@@ -269,6 +321,7 @@ public class Viewer extends Application {
             displayTiles();
             displayBoard();
             begin.getChildren().clear();
+            startRound();
         });
         Button view = new Button("Placement Viewer");
         view.setLayoutX(VIEWER_WIDTH/2+100);
@@ -325,6 +378,35 @@ public class Viewer extends Application {
             }
         }
 
+        void alertError(){
+            Rectangle up = new Rectangle();
+            Rectangle down = new Rectangle();
+            Rectangle left = new Rectangle();
+            Rectangle right = new Rectangle();
+            Rectangle[] allRec = {up,down,left,right};
+            for(Rectangle rec:allRec){
+                rec.setFill(RED);
+            }
+            up.setWidth(75);
+            up.setHeight(5);
+            up.setX(this.getLayoutX()-5);
+            up.setY(this.getLayoutY()-5);
+            down.setWidth(75);
+            down.setHeight(5);
+            down.setX(this.getLayoutX()-5);
+            down.setY(this.getLayoutY()+65);
+            left.setWidth(5);
+            left.setHeight(75);
+            left.setX(this.getLayoutX()-5);
+            left.setY(this.getLayoutY()-5);
+            right.setWidth(5);
+            right.setHeight(75);
+            right.setX(this.getLayoutX()+65);
+            right.setY(this.getLayoutY()-5);
+
+            alert.getChildren().addAll(up,down,left,right);
+        }
+
         String getPlacementString(){
             return tileName+gridName+rotate/90;
         }
@@ -345,6 +427,7 @@ public class Viewer extends Application {
                 this.y = super.getLayoutY();
                 this.toFront();
                 stringShow.getChildren().clear();
+                alert.getChildren().clear();
             });
             this.setOnMouseDragged(event -> {
                 this.setLayoutX(this.x+ event.getSceneX() - mouseX);
@@ -462,6 +545,8 @@ public class Viewer extends Application {
         }
 
         Button back = new Button("Back");
+        back.setLayoutX(20);
+        back.setLayoutY(20);
         back.setOnMousePressed(e -> {
             controls.getChildren().clear();
             placementGroup.getChildren().clear();
@@ -469,10 +554,49 @@ public class Viewer extends Application {
             special.getChildren().clear();
             dice.getChildren().clear();
             stringShow.getChildren().clear();
-            stillImage.getChildren().clear();
+            roundButton.getChildren().clear();
+            tile.getChildren().clear();
+            alert.getChildren().clear();
+            //stillImage.getChildren().clear();
+            String boardString = "";
             displayBeginPage();
         });
         board.getChildren().add(back);
+
+        Button makePlacement = new Button("Make Placement ! ");
+        makePlacement.setLayoutX(700);
+        makePlacement.setLayoutY(560);
+        makePlacement.setOnMousePressed(e ->{
+            DraggableTile[] normalTiles = {tileA1,tileA2,tileA3,tileB};
+            HashMap<DraggableTile,String> prePlacement = new HashMap<>();
+            int countError = 0;
+            for(DraggableTile tile:normalTiles){
+                String s = tile.getPlacementString();
+                if(RailroadInk.isTilePlacementWellFormed(s)){
+                    prePlacement.put(tile,s);
+                }else {
+                    tile.alertError();
+                    countError++;
+                }
+            }
+            if(countError<1){
+                int countNewError = 0;
+                for(DraggableTile tile:prePlacement.keySet()){
+                    String tempBoardString = boardString;
+                    tempBoardString=tempBoardString+prePlacement.get(tile);
+                    //这里有问题！！！！！！ 选Tile不是按照1，2，3，4顺序的！！！
+                    if(!RailroadInk.isValidPlacementSequence(tempBoardString)){
+                        tile.alertError();
+                        countNewError++;
+                        break;
+                    }
+                }
+                if(countNewError<1){
+                    startRound();
+                }
+            }
+        });
+        board.getChildren().add(makePlacement);
 
         ImageView exitB0 = new ImageView();
         exitB0.setImage(new Image(Viewer.class.getResource(URI_BASE+"RailExit.png").toString()));

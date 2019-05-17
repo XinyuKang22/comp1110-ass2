@@ -130,7 +130,6 @@ public class RailroadInk {
     }
 
 
-
     /**
      * Given a well-formed board string representing an ordered list of placements,
      * determine whether the board string is valid.
