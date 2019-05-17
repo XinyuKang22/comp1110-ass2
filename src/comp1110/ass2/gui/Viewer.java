@@ -13,6 +13,8 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import comp1110.ass2.RailroadInk;
+
+import java.util.HashMap;
 import java.util.Iterator;
 
 import static javafx.scene.paint.Color.*;
@@ -37,6 +39,7 @@ public class Viewer extends Application {
     private final Group placementGroup =new Group();
     private final Group dice =new Group();
     private final Group stillImage = new Group();
+    private final Group stringShow = new Group();
     private Iterator<Image> imageIterator;
 
 
@@ -51,6 +54,7 @@ public class Viewer extends Application {
         root.getChildren().add(stillImage);
         root.getChildren().add(dice);
         root.getChildren().add(begin);
+        root.getChildren().add(stringShow);
         displayBeginPage();
         primaryStage.setScene(scene);
         primaryStage.show();
@@ -131,6 +135,12 @@ public class Viewer extends Application {
         controls.getChildren().add(button2);
     }
 
+    void showPlacementString(String placementString){
+        Button toShow = new Button(placementString);
+        toShow.setLayoutX(100);
+        toShow.setLayoutY(100);
+        stringShow.getChildren().add(toShow);
+    }
     void displayTiles(){
         special.getChildren().add(new DraggableTile("S0",700,150,this));
         special.getChildren().add(new DraggableTile("S1",700+75,150,this));
@@ -297,7 +307,8 @@ public class Viewer extends Application {
         private double mouseX, mouseY;
         private Viewer viewer;
         private int rotate=0;
-        private int flip =1;
+        String gridName = "__";
+        //private int flip =1;
 
         void rotate(){
             rotate=rotate+90;
@@ -312,6 +323,10 @@ public class Viewer extends Application {
                 this.setRotate(rotate);
                 this.setScaleX(1);
             }
+        }
+
+        String getPlacementString(){
+            return tileName+gridName+rotate/90;
         }
 
         DraggableTile(String tileName, double x, double y, Viewer viewer){
@@ -329,6 +344,7 @@ public class Viewer extends Application {
                 this.x = super.getLayoutX();
                 this.y = super.getLayoutY();
                 this.toFront();
+                stringShow.getChildren().clear();
             });
             this.setOnMouseDragged(event -> {
                 this.setLayoutX(this.x+ event.getSceneX() - mouseX);
@@ -345,6 +361,7 @@ public class Viewer extends Application {
                 double a=150;
                 double b=100;
                 double min = 65*65*2;
+                /*
                 for(int[] location:gridLocation()){
                     double xSquare = (theX-location[0])*(theX-location[0]);
                     double ySquare = (theY-location[1])*(theY-location[1]);
@@ -354,6 +371,19 @@ public class Viewer extends Application {
                         min = xSquare+ySquare;
                     }
                 }
+                */
+                for(String key:theBoardGrid().keySet()){
+                    int gridX = theBoardGrid().get(key)[0];
+                    int gridY = theBoardGrid().get(key)[1];
+                    double xSquare = (theX-gridX)*(theX-gridX);
+                    double ySquare = (theY-gridY)*(theY-gridY);
+                    if(xSquare+ySquare<min){
+                        a = gridX;
+                        b = gridY;
+                        min = xSquare+ySquare;
+                        gridName=key;
+                    }
+                }
                 if(min<65*65*2){
                     this.setLayoutX(a);
                     this.setLayoutY(b);
@@ -361,7 +391,7 @@ public class Viewer extends Application {
                     this.setLayoutX(x);
                     this.setLayoutY(y);
                 }
-
+                showPlacementString(this.getPlacementString());
             });
         }
     }
@@ -398,6 +428,16 @@ public class Viewer extends Application {
         return list;
     }
 
+    public HashMap<String,int[]> theBoardGrid(){
+        HashMap<String,int[]> locations = new HashMap<>();
+        int[][] locationValue = gridLocation();
+        String[] locationString = Board.grid;
+        for(int i=0; i<49; i++){
+            locations.put(locationString[i],locationValue[i]);
+        }
+        return locations;
+    }
+
     class Grid extends Rectangle {
         double x,y;
         double size;
@@ -428,6 +468,8 @@ public class Viewer extends Application {
             board.getChildren().clear();
             special.getChildren().clear();
             dice.getChildren().clear();
+            stringShow.getChildren().clear();
+            stillImage.getChildren().clear();
             displayBeginPage();
         });
         board.getChildren().add(back);
