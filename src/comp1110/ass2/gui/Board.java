@@ -300,5 +300,4 @@ public class Board extends RailroadInk {
         }
         return false;
     }
-
 }
