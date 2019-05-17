@@ -1,6 +1,7 @@
 package comp1110.ass2;
 
 import comp1110.ass2.gui.Board;
+import java.util.Random;
 
 public class RailroadInk {
 
@@ -19,7 +20,6 @@ public class RailroadInk {
      * @return true if the tile placement is well formed
      */
     public static boolean isTilePlacementWellFormed(String tilePlacementString) {
-        // FIXME Task 2: determine whether a tile placement is well-formed
         if(tilePlacementString.length()!=5){
             return false;
         }else {
@@ -72,7 +72,6 @@ public class RailroadInk {
      * @return true if the board string is well-formed
      */
     public static boolean isBoardStringWellFormed(String boardString) {
-        // FIXME Task 3: determine whether a board string is well-formed
        if(boardString==null || boardString==""|| boardString.length()>155 || boardString.length()%5!=0){
            return false;
        }else {
@@ -195,8 +194,14 @@ public class RailroadInk {
      * @return a String representing the die roll e.g. A0A4A3B2
      */
     public static String generateDiceRoll() {
-        // FIXME Task 7: generate a dice roll
-        return "";
+        int result, result1, result2, result3 = 0;
+        Random r = new Random();
+        result = r.nextInt(5);
+        result1 = r.nextInt(5);
+        result2 = r.nextInt(5);
+        result3 = r.nextInt(2);
+        String dice = "A" + Integer.toString(result) + "A" +  Integer.toString(result1) + "A" +  Integer.toString(result2) +"B" + Integer.toString(result3);
+        return dice;
     }
 
     /**
@@ -211,8 +216,8 @@ public class RailroadInk {
      * @return integer (positive or negative) for score *not* considering longest rail/highway
      */
     public static int getBasicScore(String boardString) {
-        // FIXME Task 8: compute the basic score
-        return -1;
+        int score = Scoring.countConnectedExits(boardString) + Scoring.countTilesInCentre(boardString) + Scoring.countErrors(boardString);
+        return score;
     }
 
     /**
@@ -242,5 +247,6 @@ public class RailroadInk {
         // FIXME Task 12: compute the total score including bonus points
         return -1;
     }
+    
 }
 
