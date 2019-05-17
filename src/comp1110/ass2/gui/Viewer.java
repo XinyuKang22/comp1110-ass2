@@ -1,7 +1,5 @@
 package comp1110.ass2.gui;
 
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.scene.Group;
 import javafx.scene.Scene;
@@ -15,9 +13,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import comp1110.ass2.RailroadInk;
-import javafx.util.Duration;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 
 import static javafx.scene.paint.Color.*;
@@ -34,7 +29,6 @@ public class Viewer extends Application {
     private static final int VIEWER_WIDTH = 1024;
     private static final int VIEWER_HEIGHT = 640;
     private static final String URI_BASE = "assets/";
-    //private final Timeline timeline1 = new Timeline();
     private final Group root = new Group();
     private final Group begin = new Group();
     private final Group board = new Group();
@@ -45,15 +39,11 @@ public class Viewer extends Application {
     private final Group stillImage = new Group();
     private Iterator<Image> imageIterator;
 
-    //private ArrayList<ImageView> imageViews =new ArrayList<>();
-
-
 
     @Override
     public void start(Stage primaryStage) throws Exception {
         primaryStage.setTitle("Railroad Ink");
         Scene scene = new Scene(root, VIEWER_WIDTH,VIEWER_HEIGHT, Color.BEIGE);
-
         root.getChildren().add(board);
         root.getChildren().add(controls);
         root.getChildren().add(placementGroup);
@@ -61,75 +51,10 @@ public class Viewer extends Application {
         root.getChildren().add(stillImage);
         root.getChildren().add(dice);
         root.getChildren().add(begin);
-
-
         displayBeginPage();
-
         primaryStage.setScene(scene);
         primaryStage.show();
     }
-
-
-    ImageView diceBRolling(ImageView imageView){
-        ArrayList<Image> tileB = new ArrayList<>();
-        tileB.add(new Image(Viewer.class.getResource(URI_BASE+"B0.png").toString()));
-        tileB.add(new Image(Viewer.class.getResource(URI_BASE+"B1.png").toString()));
-        tileB.add(new Image(Viewer.class.getResource(URI_BASE+"B2.png").toString()));
-        Collections.shuffle(tileB);
-        imageIterator = tileB.iterator();
-        Timeline timeline = new Timeline(
-                new KeyFrame(
-                        Duration.ZERO,
-                        e -> {
-                            if(imageIterator.hasNext()) {
-                                imageView.setImage(imageIterator.next());
-                            }
-                        }
-                ),
-                new KeyFrame(Duration.millis(100)));
-        timeline.setOnFinished(event -> {
-            Collections.shuffle(tileB);
-            imageIterator = tileB.iterator();
-            timeline.playFromStart();
-        });
-        timeline.play();
-        imageView.setFitHeight(65);
-        imageView.setFitWidth(65);
-        return imageView;
-    }
-
-    ImageView diceARolling(ImageView imageView){
-        ArrayList<Image> tileA = new ArrayList<>();
-        tileA.add(new Image(Viewer.class.getResource(URI_BASE+"A0.png").toString()));
-        tileA.add(new Image(Viewer.class.getResource(URI_BASE+"A1.png").toString()));
-        tileA.add(new Image(Viewer.class.getResource(URI_BASE+"A2.png").toString()));
-        tileA.add(new Image(Viewer.class.getResource(URI_BASE+"A3.png").toString()));
-        tileA.add(new Image(Viewer.class.getResource(URI_BASE+"A4.png").toString()));
-        tileA.add(new Image(Viewer.class.getResource(URI_BASE+"A5.png").toString()));
-        Collections.shuffle(tileA);
-
-        imageIterator= tileA.iterator();
-        Timeline timeline = new Timeline(
-                new KeyFrame(
-                        Duration.ZERO,
-                        e -> {
-                            if(imageIterator.hasNext()){
-                                imageView.setImage(imageIterator.next());
-                            }
-                        }
-                ),
-                new KeyFrame(Duration.millis(100)));
-        //timeline.setCycleCount(tileA.size());
-        timeline.setOnFinished(event -> {
-            Collections.shuffle(tileA);
-            imageIterator = tileA.iterator();
-            timeline.playFromStart();
-        });
-        timeline.play();
-        imageView.setFitHeight(65);
-        imageView.setFitWidth(65);
-        return imageView;
-       }
 
 
     /**
@@ -241,49 +166,42 @@ public class Viewer extends Application {
         rectangle1.setWidth(75*4+10);
         rectangle1.setX(700-10);
         rectangle1.setY(400-10);
-        //rectangle1.setFill(DARKGRAY);
 
         Rectangle rectangle2 = new Rectangle();
         rectangle2.setHeight(10);
         rectangle2.setWidth(75*4+10);
         rectangle2.setX(700-10);
         rectangle2.setY(400+65);
-        //rectangle2.setFill(DARKGRAY);
 
         Rectangle rectangle3 = new Rectangle();
         rectangle3.setHeight(65+20);
         rectangle3.setWidth(10);
         rectangle3.setX(700-10);
         rectangle3.setY(400-10);
-        //rectangle3.setFill(DARKGRAY);
 
         Rectangle rectangle4 = new Rectangle();
         rectangle4.setHeight(65+20);
         rectangle4.setWidth(10);
         rectangle4.setX(700+65);
         rectangle4.setY(400-10);
-        //rectangle4.setFill(DARKGRAY);
 
         Rectangle rectangle5 = new Rectangle();
         rectangle5.setHeight(65+20);
         rectangle5.setWidth(10);
         rectangle5.setX(700+75*2-10);
         rectangle5.setY(400-10);
-        //rectangle5.setFill(DARKGRAY);
 
         Rectangle rectangle6 = new Rectangle();
         rectangle6.setHeight(65+20);
         rectangle6.setWidth(10);
         rectangle6.setX(700+75*3-10);
         rectangle6.setY(400-10);
-        //rectangle6.setFill(DARKGRAY);
 
         Rectangle rectangle7 = new Rectangle();
         rectangle7.setHeight(65+20);
         rectangle7.setWidth(10);
         rectangle7.setX(700+75*4-10);
         rectangle7.setY(400-10);
-        //rectangle7.setFill(DARKGRAY);
 
         special.getChildren().addAll(rectangle1,rectangle2,rectangle3,rectangle4,rectangle5,rectangle6,rectangle7);
 
@@ -313,7 +231,6 @@ public class Viewer extends Application {
         imageView4.setFitWidth(55);
         imageView4.setFitHeight(55);
 
-        //imageView1=new ImageView(Viewer.class.getResource(URI_BASE+"B0.png").toString());
         Button roll = new Button("Roll");
         roll.setLayoutX(750);
         roll.setLayoutY(500);
@@ -331,9 +248,6 @@ public class Viewer extends Application {
             dice.getChildren().clear();
             stillImage.getChildren().addAll(blank1,blank2,blank3,blank4);
         });
-
-
-
         special.getChildren().addAll(roll,stop);
     }
 
@@ -346,7 +260,6 @@ public class Viewer extends Application {
             displayBoard();
             begin.getChildren().clear();
         });
-
         Button view = new Button("Placement Viewer");
         view.setLayoutX(VIEWER_WIDTH/2+100);
         view.setLayoutY(VIEWER_HEIGHT/2);
@@ -360,7 +273,6 @@ public class Viewer extends Application {
         begin.getChildren().add(view);
 
     }
-
 
 
     class Tile extends ImageView {
@@ -626,5 +538,68 @@ public class Viewer extends Application {
         board.getChildren().add(exitG5);
 
     }
+
+    /*
+    ImageView diceBRolling(ImageView imageView){
+        ArrayList<Image> tileB = new ArrayList<>();
+        tileB.add(new Image(Viewer.class.getResource(URI_BASE+"B0.png").toString()));
+        tileB.add(new Image(Viewer.class.getResource(URI_BASE+"B1.png").toString()));
+        tileB.add(new Image(Viewer.class.getResource(URI_BASE+"B2.png").toString()));
+        Collections.shuffle(tileB);
+        imageIterator = tileB.iterator();
+        Timeline timeline = new Timeline(
+                new KeyFrame(
+                        Duration.ZERO,
+                        e -> {
+                            if(imageIterator.hasNext()) {
+                                imageView.setImage(imageIterator.next());
+                            }
+                        }
+                ),
+                new KeyFrame(Duration.millis(100)));
+        timeline.setOnFinished(event -> {
+            Collections.shuffle(tileB);
+            imageIterator = tileB.iterator();
+            timeline.playFromStart();
+        });
+        timeline.play();
+        imageView.setFitHeight(65);
+        imageView.setFitWidth(65);
+        return imageView;
+    }
+
+    ImageView diceARolling(ImageView imageView){
+        ArrayList<Image> tileA = new ArrayList<>();
+        tileA.add(new Image(Viewer.class.getResource(URI_BASE+"A0.png").toString()));
+        tileA.add(new Image(Viewer.class.getResource(URI_BASE+"A1.png").toString()));
+        tileA.add(new Image(Viewer.class.getResource(URI_BASE+"A2.png").toString()));
+        tileA.add(new Image(Viewer.class.getResource(URI_BASE+"A3.png").toString()));
+        tileA.add(new Image(Viewer.class.getResource(URI_BASE+"A4.png").toString()));
+        tileA.add(new Image(Viewer.class.getResource(URI_BASE+"A5.png").toString()));
+        Collections.shuffle(tileA);
+
+        imageIterator= tileA.iterator();
+        Timeline timeline = new Timeline(
+                new KeyFrame(
+                        Duration.ZERO,
+                        e -> {
+                            if(imageIterator.hasNext()){
+                                imageView.setImage(imageIterator.next());
+                            }
+                        }
+                ),
+                new KeyFrame(Duration.millis(100)));
+        //timeline.setCycleCount(tileA.size());
+        timeline.setOnFinished(event -> {
+            Collections.shuffle(tileA);
+            imageIterator = tileA.iterator();
+            timeline.playFromStart();
+        });
+        timeline.play();
+        imageView.setFitHeight(65);
+        imageView.setFitWidth(65);
+        return imageView;
+       }
+       */
 
 }
