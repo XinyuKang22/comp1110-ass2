@@ -3,6 +3,8 @@ package comp1110.ass2.gui;
 import comp1110.ass2.RailroadInk;
 import comp1110.ass2.Tiles;
 
+import java.util.ArrayList;
+
 
 public class Board extends RailroadInk {
 
@@ -300,4 +302,17 @@ public class Board extends RailroadInk {
         }
         return false;
     }
+
+    public static boolean isOverlap(String tilePlacementString, String boardString){
+
+        for(int i = 0; i<boardString.length(); i=i+5){
+            if(boardString.charAt(i+2)==tilePlacementString.charAt(2)){
+                if(boardString.charAt(i+3)==tilePlacementString.charAt(3)){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
 }

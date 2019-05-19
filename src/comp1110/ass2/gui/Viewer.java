@@ -19,7 +19,6 @@ import javafx.util.Duration;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 import static javafx.scene.paint.Color.*;
@@ -46,16 +45,27 @@ public class Viewer extends Application {
     private final Group roundButton = new Group();
     private final Group tile = new Group();
     private final Group alert = new Group();
-    //private final Group stillImage = new Group();
     private final Group stringShow = new Group();
     private final Group round = new Group();
-    //private Iterator<Image> imageIterator;
     private int roundNum = 1;
     String boardString = "";
     private DraggableTile tileA1;
     private DraggableTile tileA2;
     private DraggableTile tileA3;
     private DraggableTile tileB;
+    //private HashMap<DraggableTile,String> moveCache = new HashMap<>();
+    //private ArrayList<String> currentList = new ArrayList<>();
+    private ArrayList<String> moveStringRecord = new ArrayList<>();
+    private ArrayList<DraggableTile> moveTileRecord = new ArrayList<>();
+    private DraggableTile tileS0 = new DraggableTile("S0",700,150,this);
+    private DraggableTile tileS1 = new DraggableTile("S1",700+75,150,this);
+    private DraggableTile tileS2 = new DraggableTile("S2",700+75*2,150,this);
+    private DraggableTile tileS3 = new DraggableTile("S3",700,150+75,this);
+    private DraggableTile tileS4 = new DraggableTile("S4",700+75,150+75,this);
+    private DraggableTile tileS5 = new DraggableTile("S5",700+75*2,150+75,this);
+    private ArrayList<DraggableTile> availableSpecial = new ArrayList<>();
+    private int remainingSpecial = 6;
+    private int countDice = 0;
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -69,7 +79,6 @@ public class Viewer extends Application {
         root.getChildren().add(roundButton);
         root.getChildren().add(tile);
         root.getChildren().add(alert);
-        //root.getChildren().add(stillImage);
         root.getChildren().add(dice);
         root.getChildren().add(begin);
         root.getChildren().add(stringShow);
@@ -119,6 +128,8 @@ public class Viewer extends Application {
        }
     }
 
+
+
     private void startRound(){
         ImageView imageView = new ImageView();
         Image theRound = new Image(Viewer.class.getResource(URI_BASE+"round"+roundNum+".png").toString());
@@ -131,7 +142,7 @@ public class Viewer extends Application {
                 imageView.setLayoutX(150);
                 imageView.setLayoutY(110);}
         ),
-                new KeyFrame(Duration.millis(2000)));
+                new KeyFrame(Duration.millis(1000)));
         timeline.setOnFinished(e -> round.getChildren().clear());
         timeline.play();
         round.getChildren().add(imageView);
@@ -142,52 +153,20 @@ public class Viewer extends Application {
         roundButton.getChildren().add(roundReminder);
     }
 
-    /**
-     * Create a basic text field for input and a refresh button.
-     */
-    private void inputArea() {
-
-        Label label1 = new Label("Placement String:");
-        TextField textField = new TextField();
-        textField.setPrefWidth(100);
-        textField.setPrefColumnCount(3);
-        Button button1 = new Button("Make Placement");
-        button1.setOnAction(e -> {
-            makePlacement(textField.getText());
-            textField.clear();
-        });
-        Button button2 = new Button("Clear");
-        button2.setOnAction(e ->{
-            placementGroup.getChildren().clear();
-
-        });
-        button2.setLayoutX(880);
-        button2.setLayoutY(180);
-
-
-        HBox hb = new HBox();
-        hb.getChildren().addAll(label1, textField, button1);
-        hb.setSpacing(10);
-        hb.setLayoutX(660);
-        hb.setLayoutY(150);
-
-        controls.getChildren().add(hb);
-        controls.getChildren().add(button2);
-    }
-
-    void showPlacementString(String placementString){
-        Button toShow = new Button(placementString);
-        toShow.setLayoutX(100);
-        toShow.setLayoutY(100);
-        stringShow.getChildren().add(toShow);
-    }
     void displayTiles(){
-        special.getChildren().add(new DraggableTile("S0",700,150,this));
-        special.getChildren().add(new DraggableTile("S1",700+75,150,this));
-        special.getChildren().add(new DraggableTile("S2",700+75*2,150,this));
-        special.getChildren().add(new DraggableTile("S3",700,150+75,this));
-        special.getChildren().add(new DraggableTile("S4",700+75,150+75,this));
-        special.getChildren().add(new DraggableTile("S5",700+75*2,150+75,this));
+        availableSpecial.add(tileS0);
+        availableSpecial.add(tileS1);
+        availableSpecial.add(tileS2);
+        availableSpecial.add(tileS3);
+        availableSpecial.add(tileS4);
+        availableSpecial.add(tileS5);
+
+        special.getChildren().add(tileS0);
+        special.getChildren().add(tileS1);
+        special.getChildren().add(tileS2);
+        special.getChildren().add(tileS3);
+        special.getChildren().add(tileS4);
+        special.getChildren().add(tileS5);
 
         Rectangle rectangle1 = new Rectangle();
         rectangle1.setHeight(10);
@@ -233,31 +212,36 @@ public class Viewer extends Application {
 
         special.getChildren().addAll(rectangle1,rectangle2,rectangle3,rectangle4,rectangle5,rectangle6,rectangle7);
 
+        ImageView imageView0 = new ImageView(Viewer.class.getResource(URI_BASE+"dieA.gif").toString());
         ImageView imageView1 = new ImageView(Viewer.class.getResource(URI_BASE+"dieA.gif").toString());
         ImageView imageView2 = new ImageView(Viewer.class.getResource(URI_BASE+"dieA.gif").toString());
         ImageView imageView3 = new ImageView(Viewer.class.getResource(URI_BASE+"dieA.gif").toString());
-        ImageView imageView4 = new ImageView(Viewer.class.getResource(URI_BASE+"dieA.gif").toString());
+        ImageView[] diceRolling = new ImageView[4];
+        diceRolling[0] = imageView0;
+        diceRolling[1] = imageView1;
+        diceRolling[2] = imageView2;
+        diceRolling[3] = imageView3;
 
-        imageView1.setLayoutX(700);
+        imageView0.setLayoutX(700);
+        imageView0.setLayoutY(400);
+        imageView0.setFitWidth(65);
+        imageView0.setFitHeight(65);
+        imageView0.setScaleX(-1);
+        imageView1.setLayoutX(700+75);
         imageView1.setLayoutY(400);
         imageView1.setFitWidth(65);
         imageView1.setFitHeight(65);
-        imageView1.setScaleX(-1);
-        imageView2.setLayoutX(700+75);
+        imageView1.setScaleY(-1);
+        imageView2.setLayoutX(700+75*2);
         imageView2.setLayoutY(400);
         imageView2.setFitWidth(65);
         imageView2.setFitHeight(65);
+        imageView2.setScaleX(-1);
         imageView2.setScaleY(-1);
-        imageView3.setLayoutX(700+75*2);
-        imageView3.setLayoutY(400);
-        imageView3.setFitWidth(65);
-        imageView3.setFitHeight(65);
-        imageView3.setScaleX(-1);
-        imageView3.setScaleY(-1);
-        imageView4.setLayoutX(700+75*3+5);
-        imageView4.setLayoutY(400+5);
-        imageView4.setFitWidth(55);
-        imageView4.setFitHeight(55);
+        imageView3.setLayoutX(700+75*3+5);
+        imageView3.setLayoutY(400+5);
+        imageView3.setFitWidth(55);
+        imageView3.setFitHeight(55);
 
         Button roll = new Button("Roll");
         roll.setLayoutX(750);
@@ -268,24 +252,36 @@ public class Viewer extends Application {
         roll.setOnMousePressed(event -> {
             //stillImage.getChildren().clear();
             //dice.getChildren().clear();
-            dice.getChildren().add(imageView1);
-            dice.getChildren().add(imageView2);
-            dice.getChildren().add(imageView3);
-            dice.getChildren().add(imageView4);
+            dice.getChildren().add(diceRolling[countDice]);
+            //dice.getChildren().add(imageView1);
+            //dice.getChildren().add(imageView2);
+            //dice.getChildren().add(imageView3);
         });
         stop.setOnMousePressed(event -> {
             dice.getChildren().clear();
             //stillImage.getChildren().addAll(blank1,blank2,blank3,blank4);
             String diceResult = RailroadInk.generateDiceRoll();
+
             tileA1 = new DraggableTile(diceResult.substring(0,2),700,400,this);
             tileA2 = new DraggableTile(diceResult.substring(2,4),700+75,400,this);
             tileA3 = new DraggableTile(diceResult.substring(4,6),700+75*2,400,this);
             tileB = new DraggableTile(diceResult.substring(6),700+75*3,400,this);
 
+            DraggableTile[] tiles = new DraggableTile[4];
+            tiles[0]=tileA1;
+            tiles[1]=tileA2;
+            tiles[2]=tileA3;
+            tiles[3]=tileB;
+
+            tile.getChildren().add(tiles[countDice]);
+            countDice++;
+            /*
             tile.getChildren().add(tileA1);
             tile.getChildren().add(tileA2);
             tile.getChildren().add(tileA3);
             tile.getChildren().add(tileB);
+            */
+
         });
         special.getChildren().addAll(roll,stop);
         /*
@@ -419,6 +415,8 @@ public class Viewer extends Application {
 
             this.setOnScroll(event -> {
                 this.rotate();
+                moveStringRecord.add(this.getPlacementString());
+                moveTileRecord.add(this);
             });
             this.setOnMousePressed(event -> {
                 this.mouseX = event.getSceneX();
@@ -444,17 +442,7 @@ public class Viewer extends Application {
                 double a=150;
                 double b=100;
                 double min = 65*65*2;
-                /*
-                for(int[] location:gridLocation()){
-                    double xSquare = (theX-location[0])*(theX-location[0]);
-                    double ySquare = (theY-location[1])*(theY-location[1]);
-                    if(xSquare+ySquare<min){
-                        a = location[0];
-                        b = location[1];
-                        min = xSquare+ySquare;
-                    }
-                }
-                */
+
                 for(String key:theBoardGrid().keySet()){
                     int gridX = theBoardGrid().get(key)[0];
                     int gridY = theBoardGrid().get(key)[1];
@@ -474,7 +462,9 @@ public class Viewer extends Application {
                     this.setLayoutX(x);
                     this.setLayoutY(y);
                 }
-                showPlacementString(this.getPlacementString());
+                moveStringRecord.add(this.getPlacementString());
+                moveTileRecord.add(this);
+
             });
         }
     }
@@ -503,8 +493,8 @@ public class Viewer extends Application {
         int count = 0;
         for(int i=0; i<7; i++){
             for(int m=0; m<7; m++){
-                list[count][0]=150+i*65;
-                list[count][1]=100+m*65;
+                list[count][0]=150+m*65;
+                list[count][1]=100+i*65;
                 count++;
             }
         }
@@ -557,8 +547,11 @@ public class Viewer extends Application {
             roundButton.getChildren().clear();
             tile.getChildren().clear();
             alert.getChildren().clear();
-            //stillImage.getChildren().clear();
-            String boardString = "";
+            boardString = "";
+            availableSpecial.clear();
+            remainingSpecial=6;
+            moveTileRecord.clear();
+
             displayBeginPage();
         });
         board.getChildren().add(back);
@@ -568,32 +561,142 @@ public class Viewer extends Application {
         makePlacement.setLayoutY(560);
         makePlacement.setOnMousePressed(e ->{
             DraggableTile[] normalTiles = {tileA1,tileA2,tileA3,tileB};
-            HashMap<DraggableTile,String> prePlacement = new HashMap<>();
             int countError = 0;
             for(DraggableTile tile:normalTiles){
-                String s = tile.getPlacementString();
-                if(RailroadInk.isTilePlacementWellFormed(s)){
-                    prePlacement.put(tile,s);
-                }else {
-                    tile.alertError();
-                    countError++;
+                try {
+                    if(!RailroadInk.isTilePlacementWellFormed(tile.getPlacementString())){
+                        tile.alertError();
+                        countError++;
+                        System.out.println("not enough tiles");
+                    }
+                }catch (NullPointerException e1){
+                    System.out.println("did not roll the dice");
+                    //让“Roll”飘红！！！！！！
                 }
             }
-            if(countError<1){
-                int countNewError = 0;
-                for(DraggableTile tile:prePlacement.keySet()){
-                    String tempBoardString = boardString;
-                    tempBoardString=tempBoardString+prePlacement.get(tile);
-                    //这里有问题！！！！！！ 选Tile不是按照1，2，3，4顺序的！！！
-                    if(!RailroadInk.isValidPlacementSequence(tempBoardString)){
-                        tile.alertError();
-                        countNewError++;
+            //到这为止没问题
+
+            if(countError<1) {
+                ArrayList<DraggableTile> orderedTileList = new ArrayList<>();
+                for(DraggableTile d:moveTileRecord){
+                    if(!orderedTileList.contains(d)){
+                        orderedTileList.add(d);
+                    }
+                }
+                ArrayList<String> orderedStringList = new ArrayList<>();
+                for(DraggableTile tile:orderedTileList){
+                    orderedStringList.add(tile.getPlacementString());
+                }
+                int numOfMovedTile = orderedTileList.size();
+                String copyOfBoardString = boardString;
+                ArrayList<String> toWait = new ArrayList<>();
+                for(String tilePlacementString:orderedStringList){
+                    boolean canAddToBoard = false;
+                    if(Board.isOverlap(tilePlacementString,copyOfBoardString)){
+                        orderedTileList.get(orderedStringList.indexOf(tilePlacementString)).alertError();
+                    }else {
+                        if(Board.isConnectedToExit(tilePlacementString)){
+                            //copyOfBoardString=copyOfBoardString+tilePlacementString;
+                            canAddToBoard=true;
+                        }else if (copyOfBoardString.isEmpty()){
+                            orderedTileList.get(orderedStringList.indexOf(tilePlacementString)).alertError();
+                        }else {
+                            String[] tilePlacementList = new String[copyOfBoardString.length()/5];
+                            int countPlacement = 0;
+                            for(int i = 0; i<copyOfBoardString.length(); i=i+5){
+                                tilePlacementList[countPlacement]=copyOfBoardString.substring(i,i+5);
+                                countPlacement++;
+                            }
+                            if(Board.hasConnectedNeighbors(tilePlacementString,tilePlacementList)){
+                                //copyOfBoardString=copyOfBoardString+tilePlacementString;
+                                canAddToBoard=true;
+                            }else {
+                                toWait.add(tilePlacementString);
+                            }
+                        }
+                    }
+                    if(canAddToBoard){
+                        for(String s:toWait){
+                            if(RailroadInk.areConnectedNeighbours(s,tilePlacementString)){
+
+                            }
+                        }
+                    }
+                }
+                /*
+                int countInvalid = 0;
+                for (int i=0; i<numOfMovedTile; i++){
+                    copyOfBoardString=copyOfBoardString+orderedStringList.get(i);
+                    if(!RailroadInk.isValidPlacementSequence(copyOfBoardString)){
+                        orderedTileList.get(i).alertError();
+                        System.out.println("invalid placement"+copyOfBoardString);
+                        countInvalid++;
                         break;
                     }
                 }
-                if(countNewError<1){
-                    startRound();
+                int countSpecialTile = 0;
+                for(String s:orderedStringList){
+                    if(s.substring(0,1).equals("S")){
+                        countSpecialTile++;
+                    }
+                    if(remainingSpecial-countSpecialTile<3){
+                        int i = orderedStringList.indexOf(s);
+                        orderedTileList.get(i).alertError();
+                        System.out.println("too much special tiles");
+                        countInvalid++;
+                        //要加带锁的图片
+                        break;
+                    }
                 }
+
+                if(countInvalid<1){
+                    remainingSpecial=remainingSpecial-countSpecialTile;
+                    for(String s:orderedStringList){
+                        boardString=boardString+s;
+                    }
+                    ArrayList<DraggableTile> usedSpecial = new ArrayList<>();
+                    System.out.println("special tiles: "+countSpecialTile);
+                    if(countSpecialTile>0){
+                        for(String s:orderedStringList){
+                            switch (s.substring(0,2)){
+                                case "S0":
+                                    usedSpecial.add(tileS0);
+                                    break;
+                                case "S1":
+                                    usedSpecial.add(tileS1);
+                                    break;
+                                case "S2":
+                                    usedSpecial.add(tileS2);
+                                    break;
+                                case "S3":
+                                    usedSpecial.add(tileS3);
+                                    break;
+                                case "S4":
+                                    usedSpecial.add(tileS4);
+                                    break;
+                                case "S5":
+                                    usedSpecial.add(tileS5);
+                                    break;
+                            }
+                        }
+
+                        orderedStringList.clear();
+                        orderedTileList.clear();
+                     }
+                    System.out.println("board String: "+boardString);
+                    makePlacement(boardString);
+
+                    for(DraggableTile specialTile:usedSpecial){
+                        availableSpecial.remove(specialTile);
+                        special.getChildren().remove(specialTile);
+                    }
+                    for(DraggableTile thisTile:orderedTileList){
+                        if(!thisTile.getPlacementString().substring(0,1).equals("S")){
+                            tile.getChildren().remove(thisTile);
+                        }
+                    }
+            }
+                */
             }
         });
         board.getChildren().add(makePlacement);
@@ -767,5 +870,44 @@ public class Viewer extends Application {
         return imageView;
        }
        */
+    /**
+     * Create a basic text field for input and a refresh button.
+     */
+    private void inputArea() {
+
+        Label label1 = new Label("Placement String:");
+        TextField textField = new TextField();
+        textField.setPrefWidth(100);
+        textField.setPrefColumnCount(3);
+        Button button1 = new Button("Make Placement");
+        button1.setOnAction(e -> {
+            makePlacement(textField.getText());
+            textField.clear();
+        });
+        Button button2 = new Button("Clear");
+        button2.setOnAction(e ->{
+            placementGroup.getChildren().clear();
+
+        });
+        button2.setLayoutX(880);
+        button2.setLayoutY(180);
+
+
+        HBox hb = new HBox();
+        hb.getChildren().addAll(label1, textField, button1);
+        hb.setSpacing(10);
+        hb.setLayoutX(660);
+        hb.setLayoutY(150);
+
+        controls.getChildren().add(hb);
+        controls.getChildren().add(button2);
+    }
+
+    void showPlacementString(String placementString){
+        Button toShow = new Button(placementString);
+        toShow.setLayoutX(100);
+        toShow.setLayoutY(100);
+        stringShow.getChildren().add(toShow);
+    }
 
 }

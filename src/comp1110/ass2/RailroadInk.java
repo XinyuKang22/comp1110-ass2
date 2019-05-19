@@ -181,6 +181,9 @@ public class RailroadInk {
     }
 
 
+    public static void main(String[] args) {
+        System.out.println(isValidPlacementSequence("A4G31A0F40"));
+    }
 
     /**
      * Generate a random dice roll as a string of eight characters.
