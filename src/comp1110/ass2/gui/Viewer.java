@@ -59,8 +59,67 @@ public class Viewer extends Application {
     private int remainingSpecial = 6;
     private int countDice = 0;
     private DraggableTile tileMoved;
-    private ArrayList<DraggableTile> specialMoved = new ArrayList<>();
+    private DraggableTile specialMoved = null;
+    private Group specialPictures = new Group();
 
+    private ArrayList<ImageView> specialPics(){
+        ArrayList<ImageView> toReturn = new ArrayList<>();
+        DraggableTile[] a = {tileS0, tileS1, tileS2, tileS3, tileS4, tileS5};
+        for(DraggableTile tile:a){
+            int i = Integer.parseInt(tile.tileName.substring(1,2));
+            ImageView imageView = new ImageView(Viewer.class.getResource(URI_BASE+tile.tileName+".png").toString());
+            imageView.setFitHeight(65);
+            imageView.setFitWidth(65);
+            if(i<3){
+                imageView.setLayoutX(700+i*75);
+                imageView.setLayoutY(150);
+            }else {
+                imageView.setLayoutX(700+(i-3)*75);
+                imageView.setLayoutY(150+75);
+            }
+            imageView.setOnMouseClicked(e -> {
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setHeaderText("This special tile is locked. ");
+                alert.showAndWait();
+            });
+            toReturn.add(imageView);
+        }
+        return toReturn;
+    }
+
+    private ArrayList<ImageView> specialImages(DraggableTile tileClicked){
+        ArrayList<ImageView> toReturn = new ArrayList<>();
+        for(DraggableTile tile:availableSpecial){
+            if(!tile.tileName.equals(tileClicked.tileName)){
+                int i = Integer.parseInt(tile.tileName.substring(1,2));
+                ImageView imageView = new ImageView(Viewer.class.getResource(URI_BASE+tile.tileName+".png").toString());
+                imageView.setFitHeight(65);
+                imageView.setFitWidth(65);
+                if(i<3){
+                    imageView.setLayoutX(700+i*75);
+                    imageView.setLayoutY(150);
+                }else {
+                    imageView.setLayoutX(700+(i-3)*75);
+                    imageView.setLayoutY(150+75);
+                }
+                imageView.setOnMouseClicked(e -> {
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setHeaderText("This special tile is locked. ");
+                    alert.showAndWait();
+                });
+                toReturn.add(imageView);
+            }
+        }
+        return toReturn;
+    }
+
+    private void finishGame(){
+        special.getChildren().clear();
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("You have finished the game!!");
+        alert.setHeaderText("Your basic score is:  "+RailroadInk.getBasicScore(boardString));
+        alert.showAndWait();
+    }
     @Override
     public void start(Stage primaryStage) throws Exception {
         primaryStage.setTitle("Railroad Ink");
@@ -76,7 +135,7 @@ public class Viewer extends Application {
         root.getChildren().add(dice);
         root.getChildren().add(begin);
         root.getChildren().add(stringShow);
-        root.getChildren().add(specialTiles);
+        //root.getChildren().add(specialTiles);
         displayBeginPage();
         primaryStage.setScene(scene);
         primaryStage.show();
@@ -126,27 +185,42 @@ public class Viewer extends Application {
 
 
     private void startRound(){
-        ImageView imageView = new ImageView();
-        Image theRound = new Image(Viewer.class.getResource(URI_BASE+"round"+roundNum+".png").toString());
-        //round.getChildren().add(theRound);
-        Timeline timeline = new Timeline(   new KeyFrame(
-                Duration.ZERO,
-                e -> {imageView.setImage(theRound);
-                imageView.setFitHeight(300);
-                imageView.setFitWidth(700);
-                imageView.setLayoutX(150);
-                imageView.setLayoutY(110);}
-        ),
-                new KeyFrame(Duration.millis(1000)));
-        timeline.setOnFinished(e -> round.getChildren().clear());
-        timeline.play();
-        round.getChildren().add(imageView);
+        if(roundNum==8){
+            finishGame();
+        }else {
+            ImageView imageView = new ImageView();
+            Image theRound = new Image(Viewer.class.getResource(URI_BASE+"round"+roundNum+".png").toString());
+            //round.getChildren().add(theRound);
+            Timeline timeline = new Timeline(   new KeyFrame(
+                    Duration.ZERO,
+                    e -> {imageView.setImage(theRound);
+                        imageView.setFitHeight(300);
+                        imageView.setFitWidth(700);
+                        imageView.setLayoutX(150);
+                        imageView.setLayoutY(110);}
+            ),
+                    new KeyFrame(Duration.millis(1000)));
+            timeline.setOnFinished(e -> round.getChildren().clear());
+            timeline.play();
+            round.getChildren().add(imageView);
 
-        Button roundReminder = new Button("Round: "+roundNum);
-        roundReminder.setLayoutX(800);
-        roundReminder.setLayoutY(20);
-        roundButton.getChildren().add(roundReminder);
+            Button roundReminder = new Button("Round: "+roundNum);
+            roundReminder.setLayoutX(650);
+            roundReminder.setLayoutY(20);
+            Button boardStringViewer = new Button("Click to view boardString");
+            boardStringViewer.setLayoutX(810);
+            boardStringViewer.setLayoutY(20);
+            boardStringViewer.setOnMousePressed(e -> {
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setHeaderText(boardString+",   score: "+RailroadInk.getBasicScore(boardString));
+                alert.showAndWait();
+            });
+            roundButton.getChildren().add(roundReminder);
+            roundButton.getChildren().add(boardStringViewer);
+            countDice=0;
+        }
     }
+
     void displayRollingArea(){
         ImageView lockedSpecial = new ImageView(Viewer.class.getResource(URI_BASE+"lockedSpecial.png").toString());
         lockedSpecial.setFitWidth(215);
@@ -154,7 +228,11 @@ public class Viewer extends Application {
         lockedSpecial.setLayoutX(700);
         lockedSpecial.setLayoutY(150);
 
-        special.getChildren().add(lockedSpecial);
+        //special.getChildren().add(lockedSpecial);
+        for(ImageView specialPic:specialPics()){
+            specialPictures.getChildren().add(specialPic);
+        }
+        special.getChildren().add(specialPictures);
 
         Rectangle rectangle1 = new Rectangle();
         rectangle1.setHeight(10);
@@ -246,15 +324,15 @@ public class Viewer extends Application {
             tileMoved = new DraggableTile(diceResult.substring(countDice*2,countDice*2+2),700+countDice*75,400,this);
             tile.getChildren().add(tileMoved);
             countDice++;
-            //如果countdice超过4怎么办？？
+
             Button useSpecial = new Button("Change to use special tiles");
             useSpecial.setLayoutX(700+150);
             useSpecial.setLayoutY(560);
             useSpecial.setOnMousePressed(e -> {
                 tile.getChildren().remove(tileMoved);
-                specialMoved.clear();
-                special.getChildren().remove(lockedSpecial);
-                //special.getChildren().add(specialTiles);
+                special.getChildren().add(specialTiles);
+                special.getChildren().remove(specialPictures);
+
             });
 
             Button makePlacement = new Button("Make Placement ! ");
@@ -262,10 +340,8 @@ public class Viewer extends Application {
             makePlacement.setLayoutY(560);
             makePlacement.setOnMousePressed(e ->{   //现在不会出现两个special tile 了， 完了再简化一下这里
                 String placementString;
-                for(DraggableTile special:specialMoved){
-                    System.out.println(special.getPlacementString());
-                }
-                if(specialMoved.isEmpty()){
+
+                if(specialMoved==null){
                     placementString = tileMoved.getPlacementString();
                     if(RailroadInk.isValidPlacementSequence(boardString+placementString)){
                         makePlacement(placementString);
@@ -275,29 +351,50 @@ public class Viewer extends Application {
                         board.getChildren().remove(useSpecial);
                         board.getChildren().remove(makePlacement);
                         boardString=boardString+placementString;
+                        specialMoved=null;
+                        if(countDice==4){
+                            roundNum++;
+                            startRound();
+                        }
                     }else {
                         tileMoved.alertError();
                         Alert alert = new Alert(Alert.AlertType.INFORMATION);
                         alert.headerTextProperty().set("Invalid Placement!!");
                         alert.showAndWait();
                     }
-                }else {  //如果没按change就用了special tile测不出来！！！！！！！！
-                    placementString = specialMoved.get(0).getPlacementString();
+                }else {
+                    placementString = specialMoved.getPlacementString();
                     if(RailroadInk.isValidPlacementSequence(boardString+placementString)){
                         makePlacement(placementString);
-                        availableSpecial.remove(specialMoved.get(0));
-                        specialTiles.getChildren().remove(specialMoved.get(0));
+                        availableSpecial.remove(specialMoved);
+                        specialTiles.getChildren().remove(specialMoved);
                         special.getChildren().add(roll);
                         special.getChildren().add(stop);
                         board.getChildren().remove(useSpecial);
                         board.getChildren().remove(makePlacement);
                         boardString=boardString+placementString;
-                        specialMoved.clear();
+                        specialMoved=null;
+                        remainingSpecial--;
+                        if(remainingSpecial<=3){
+                            specialTiles.getChildren().clear();
+                            specialPictures.getChildren().clear();
+                            availableSpecial.clear();
+                        }
+                        if(countDice==4){
+                            roundNum++;
+                            startRound();
+                        }
                     }else {
-                        specialMoved.get(0).alertError();
+                        DraggableTile a = specialMoved;
+                        special.getChildren().remove(specialPictures);
+                        special.getChildren().remove(specialMoved);
+                        specialTiles.getChildren().add(a);
+                        a.backToOrigin();
+                        special.getChildren().add(specialTiles);
                         Alert alert = new Alert(Alert.AlertType.INFORMATION);
                         alert.headerTextProperty().set("Invalid Special Placement!!");
                         alert.showAndWait();
+                        specialMoved=null;
                     }
 
                 }
@@ -306,8 +403,9 @@ public class Viewer extends Application {
             board.getChildren().add(makePlacement);
             special.getChildren().remove(roll);
             special.getChildren().remove(stop);
-            board.getChildren().add(useSpecial);
-            //specialTiles.getChildren().clear();
+            if(remainingSpecial>3){
+                board.getChildren().add(useSpecial);
+            }
         });
         special.getChildren().addAll(roll,stop);
     }
@@ -380,18 +478,19 @@ public class Viewer extends Application {
         private int rotate=0;
         String gridName = "__";
 
-        void recordSpecial(){
+        void lockOthers(){
             if(this.tileName.substring(0,1).equals("S")){
-                if(this.getLayoutX()<700){
-                    if(specialMoved.isEmpty() ){
-                        specialMoved.add(this);
-                    }else {
-                        backToOrigin();
-                    }
+                specialMoved=this;
+                special.getChildren().remove(specialTiles);
+                special.getChildren().add(this);
+                specialPictures.getChildren().clear();
+                for(ImageView imageView:specialImages(this)){
+                    specialPictures.getChildren().add(imageView);
                 }
+                special.getChildren().add(specialPictures);
+
             }
         }
-
 
         void rotate(){
             rotate=rotate+90;
@@ -446,7 +545,9 @@ public class Viewer extends Application {
                 this.setLayoutX(700+(i-3)*75);
                 this.setLayoutY(150+75);
             }
-            specialMoved.remove(this);
+            this.setRotate(0);
+            this.setScaleX(1);
+            specialMoved=null;
         }
 
         String getPlacementString(){
@@ -471,6 +572,7 @@ public class Viewer extends Application {
                 this.toFront();
                 stringShow.getChildren().clear();
                 alert.getChildren().clear();
+                lockOthers();
             });
             this.setOnMouseDragged(event -> {
                 this.setLayoutX(this.x+ event.getSceneX() - mouseX);
@@ -507,7 +609,7 @@ public class Viewer extends Application {
                     this.setLayoutX(x);
                     this.setLayoutY(y);
                 }
-                recordSpecial();
+                //recordSpecial();
             });
         }
     }
@@ -594,7 +696,7 @@ public class Viewer extends Application {
             availableSpecial.clear();
             remainingSpecial=6;
             moveTileRecord.clear();
-            specialTiles.getChildren().clear();
+            //specialTiles.getChildren().clear();
 
             displayBeginPage();
         });
