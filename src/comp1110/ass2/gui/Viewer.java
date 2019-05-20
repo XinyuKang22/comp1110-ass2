@@ -481,14 +481,13 @@ public class Viewer extends Application {
         void lockOthers(){
             if(this.tileName.substring(0,1).equals("S")){
                 specialMoved=this;
-                special.getChildren().remove(specialTiles);
                 special.getChildren().add(this);
+                special.getChildren().remove(specialTiles);
                 specialPictures.getChildren().clear();
                 for(ImageView imageView:specialImages(this)){
                     specialPictures.getChildren().add(imageView);
                 }
                 special.getChildren().add(specialPictures);
-
             }
         }
 
@@ -562,7 +561,6 @@ public class Viewer extends Application {
 
             this.setOnScroll(event -> {
                 this.rotate();
-                //recordSpecial();
             });
             this.setOnMousePressed(event -> {
                 this.mouseX = event.getSceneX();
@@ -572,7 +570,6 @@ public class Viewer extends Application {
                 this.toFront();
                 stringShow.getChildren().clear();
                 alert.getChildren().clear();
-                lockOthers();
             });
             this.setOnMouseDragged(event -> {
                 this.setLayoutX(this.x+ event.getSceneX() - mouseX);
@@ -609,7 +606,7 @@ public class Viewer extends Application {
                     this.setLayoutX(x);
                     this.setLayoutY(y);
                 }
-                //recordSpecial();
+                lockOthers();
             });
         }
     }
