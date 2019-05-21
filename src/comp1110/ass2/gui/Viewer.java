@@ -1,5 +1,6 @@
 package comp1110.ass2.gui;
 
+import comp1110.ass2.MultiplePlayers;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
@@ -14,7 +15,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
-import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import comp1110.ass2.RailroadInk;
@@ -36,8 +36,8 @@ public class Viewer extends Application {
     private static final int VIEWER_WIDTH = 1024;
     private static final int VIEWER_HEIGHT = 640;
     private static final String URI_BASE = "assets/";
-    private final Group root = new Group();
-    private final Group begin = new Group();
+    public static Group root = new Group();
+    public static Group begin = new Group();
     private final Group board = new Group();
     private final Group controls = new Group();
     private final Group special = new Group();
@@ -204,7 +204,6 @@ public class Viewer extends Application {
         }else {
             ImageView imageView = new ImageView();
             Image theRound = new Image(Viewer.class.getResource(URI_BASE+"round"+roundNum+".png").toString());
-            //round.getChildren().add(theRound);
             Timeline timeline = new Timeline(   new KeyFrame(
                     Duration.ZERO,
                     e -> {imageView.setImage(theRound);
@@ -462,6 +461,10 @@ public class Viewer extends Application {
         Button startMul = new Button("Against Computer ! ");
         startMul.setLayoutX(800);
         startMul.setLayoutY(500);
+        startMul.setOnMousePressed(e -> {
+            root.getChildren().remove(begin);
+            MultiplePlayers.mulStart(root);
+        });
 
         Button view = new Button("Placement Viewer");
         view.setLayoutX(800);
@@ -684,10 +687,10 @@ public class Viewer extends Application {
         return locations;
     }
 
-    class Grid extends Rectangle {
+    public static class Grid extends Rectangle {
         double x,y;
         double size;
-        Grid(double x, double y, double size){
+        public Grid(double x, double y, double size){
             this.x=x;
             this.y=y;
             this.size=size;
