@@ -14,9 +14,12 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import comp1110.ass2.RailroadInk;
 import javafx.util.Duration;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import static javafx.scene.paint.Color.*;
@@ -115,10 +118,21 @@ public class Viewer extends Application {
 
     private void finishGame(){
         special.getChildren().clear();
+        int basicScore = RailroadInk.getBasicScore(boardString);
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("You have finished the game!!");
-        alert.setHeaderText("Your basic score is:  "+RailroadInk.getBasicScore(boardString));
+        alert.setHeaderText("Your basic score is:  "+basicScore);
         alert.showAndWait();
+        Button score = new Button("Your basic score is :    "+basicScore);
+        score.setLayoutX(750);
+        score.setLayoutY(200);
+        Text t = new Text();
+        t.setText("GOOD JOB! ");
+        t.setX(750);
+        t.setY(250);
+        t.setFill(RED);
+        special.getChildren().add(score);
+        special.getChildren().add(t);
     }
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -330,20 +344,19 @@ public class Viewer extends Application {
             useSpecial.setLayoutY(560);
             useSpecial.setOnMousePressed(e -> {
                 tile.getChildren().remove(tileMoved);
-                special.getChildren().add(specialTiles);
                 special.getChildren().remove(specialPictures);
-
+                special.getChildren().add(specialTiles);
+                board.getChildren().remove(useSpecial);
             });
 
             Button makePlacement = new Button("Make Placement ! ");
             makePlacement.setLayoutX(700);
             makePlacement.setLayoutY(560);
-            makePlacement.setOnMousePressed(e ->{   //现在不会出现两个special tile 了， 完了再简化一下这里
+            makePlacement.setOnMousePressed(e ->{
                 String placementString;
-
                 if(specialMoved==null){
                     placementString = tileMoved.getPlacementString();
-                    if(RailroadInk.isValidPlacementSequence(boardString+placementString)){
+                    if(RailroadInk.isValidPlacementSequence(boardString+placementString) &&!Board.isOverlap(placementString,boardString)){
                         makePlacement(placementString);
                         tile.getChildren().remove(tileMoved);
                         special.getChildren().add(roll);
@@ -364,10 +377,11 @@ public class Viewer extends Application {
                     }
                 }else {
                     placementString = specialMoved.getPlacementString();
-                    if(RailroadInk.isValidPlacementSequence(boardString+placementString)){
+                    if(RailroadInk.isValidPlacementSequence(boardString+placementString)&&!Board.isOverlap(placementString,boardString)){
                         makePlacement(placementString);
                         availableSpecial.remove(specialMoved);
                         specialTiles.getChildren().remove(specialMoved);
+                        special.getChildren().remove(specialMoved);
                         special.getChildren().add(roll);
                         special.getChildren().add(stop);
                         board.getChildren().remove(useSpecial);
@@ -428,27 +442,42 @@ public class Viewer extends Application {
     }
 
     void displayBeginPage(){
-        Button start  = new Button("Start Game");
-        start.setLayoutX(VIEWER_WIDTH/2-100);
-        start.setLayoutY(VIEWER_HEIGHT/2);
+        ImageView logo = new ImageView(Viewer.class.getResource(URI_BASE+"LOGO.png").toString());
+        logo.setFitWidth(900);
+        logo.setFitHeight(700);
+        logo.setLayoutX(0);
+        logo.setLayoutY(0);
+
+        Button start  = new Button("SOLO game ! ");
+        start.setLayoutX(800);
+        start.setLayoutY(450);
         start.setOnMousePressed(event ->{
             displayRollingArea();
             displayBoard();
             displaySpecials();
+
             begin.getChildren().clear();
             startRound();
         });
+
+        Button startMul = new Button("Against Computer ! ");
+        startMul.setLayoutX(800);
+        startMul.setLayoutY(500);
+
         Button view = new Button("Placement Viewer");
-        view.setLayoutX(VIEWER_WIDTH/2+100);
-        view.setLayoutY(VIEWER_HEIGHT/2);
+        view.setLayoutX(800);
+        view.setLayoutY(550);
         view.setOnMousePressed(event ->{
             inputArea();
             displayBoard();
             begin.getChildren().clear();
         });
 
+
         begin.getChildren().add(start);
         begin.getChildren().add(view);
+        begin.getChildren().add(startMul);
+        begin.getChildren().add(logo);
 
     }
 
@@ -480,14 +509,17 @@ public class Viewer extends Application {
 
         void lockOthers(){
             if(this.tileName.substring(0,1).equals("S")){
-                specialMoved=this;
-                special.getChildren().add(this);
-                special.getChildren().remove(specialTiles);
-                specialPictures.getChildren().clear();
-                for(ImageView imageView:specialImages(this)){
-                    specialPictures.getChildren().add(imageView);
+                if(specialMoved==null){
+                    specialMoved=this;
+                    special.getChildren().add(this);
+                    special.getChildren().remove(specialTiles);
+                    specialPictures.getChildren().clear();
+                    for(ImageView imageView:specialImages(this)){
+                        specialPictures.getChildren().add(imageView);
+                    }
+                    special.getChildren().add(specialPictures);
                 }
-                special.getChildren().add(specialPictures);
+
             }
         }
 
@@ -806,68 +838,7 @@ public class Viewer extends Application {
 
     }
 
-    /*
-    ImageView diceBRolling(ImageView imageView){
-        ArrayList<Image> tileB = new ArrayList<>();
-        tileB.add(new Image(Viewer.class.getResource(URI_BASE+"B0.png").toString()));
-        tileB.add(new Image(Viewer.class.getResource(URI_BASE+"B1.png").toString()));
-        tileB.add(new Image(Viewer.class.getResource(URI_BASE+"B2.png").toString()));
-        Collections.shuffle(tileB);
-        imageIterator = tileB.iterator();
-        Timeline timeline = new Timeline(
-                new KeyFrame(
-                        Duration.ZERO,
-                        e -> {
-                            if(imageIterator.hasNext()) {
-                                imageView.setImage(imageIterator.next());
-                            }
-                        }
-                ),
-                new KeyFrame(Duration.millis(100)));
-        timeline.setOnFinished(event -> {
-            Collections.shuffle(tileB);
-            imageIterator = tileB.iterator();
-            timeline.playFromStart();
-        });
-        timeline.play();
-        imageView.setFitHeight(65);
-        imageView.setFitWidth(65);
-        return imageView;
-    }
 
-    ImageView diceARolling(ImageView imageView){
-        ArrayList<Image> tileA = new ArrayList<>();
-        tileA.add(new Image(Viewer.class.getResource(URI_BASE+"A0.png").toString()));
-        tileA.add(new Image(Viewer.class.getResource(URI_BASE+"A1.png").toString()));
-        tileA.add(new Image(Viewer.class.getResource(URI_BASE+"A2.png").toString()));
-        tileA.add(new Image(Viewer.class.getResource(URI_BASE+"A3.png").toString()));
-        tileA.add(new Image(Viewer.class.getResource(URI_BASE+"A4.png").toString()));
-        tileA.add(new Image(Viewer.class.getResource(URI_BASE+"A5.png").toString()));
-        Collections.shuffle(tileA);
-
-        imageIterator= tileA.iterator();
-        Timeline timeline = new Timeline(
-                new KeyFrame(
-                        Duration.ZERO,
-                        e -> {
-                            if(imageIterator.hasNext()){
-                                imageView.setImage(imageIterator.next());
-                            }
-                        }
-                ),
-                new KeyFrame(Duration.millis(100)));
-        //timeline.setCycleCount(tileA.size());
-        timeline.setOnFinished(event -> {
-            Collections.shuffle(tileA);
-            imageIterator = tileA.iterator();
-            timeline.playFromStart();
-        });
-        timeline.play();
-        imageView.setFitHeight(65);
-        imageView.setFitWidth(65);
-        return imageView;
-       }
-       */
     /**
      * Create a basic text field for input and a refresh button.
      */
