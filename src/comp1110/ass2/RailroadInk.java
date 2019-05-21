@@ -183,8 +183,9 @@ public class RailroadInk {
     public static void main(String[] args) {
         String a = "A3D61A3D53B0C52A0B52A2B63A4D41B0E60A0F61A3D31A3D23A2G30B0F34A3E32A1B01B2B10A1B21A0A63A4D01A1G41B0G12S2D10A4C10B2A10A2B33A1A30S4E11A4E21A3C21A3C31S5F11";
         String b = "A3A10A3A52A3G10B2F10S1B50A2B61A0C60A1B41B1A35A4A41A2B31A1C30B0D32A2C50A4E10A3D12B2B10A2F01A0G00A4D01B1A27S3B20A4C10A1D50A0F23B2G25A3E30A4E41";
-        System.out.println(getBasicScore(a));
-        System.out.println(getBasicScore(b));
+        String[] c = {"B2A01"};
+        System.out.println(Board.hasConnectedNeighbors("A3A10", c));
+        System.out.println(generateMove(a,"A0A4A3B2"));
     }
 
     /**
@@ -233,8 +234,25 @@ public class RailroadInk {
      * @see RailroadInk#generateDiceRoll()
      */
     public static String generateMove(String boardString, String diceRoll) {
-        // FIXME Task 10: generate a valid move
-        return null;
+        String place = "";
+        String moves = "";
+        String[] a = {"A", "B", "C", "D", "E", "F", "G" };
+        String[] b = {"0", "1", "2", "3", "4", "5", "6" };
+        String[] c = {"0", "1", "2", "3", "4", "5", "6", "7" };
+        for (int x = 0; x<7; x++){
+            for (int y = 0; y<7; y++){
+                for (int z = 0; z<8; z++){ place += a[x] + b[y] + c[z]; }}}
+
+        for (int i = 0; i < 8; i = i+2){
+            for (int j = 0; j<place.length(); j += 3){
+                String move = diceRoll.substring(i,i+2) + place.substring(j,j+3);
+                if(isValidPlacementSequence(boardString + move)  && !Board.isOverlap(move ,boardString)){
+                    boardString += boardString + move;
+                    moves += move ;
+                    break;}
+            }}
+
+        return moves;
     }
 
     /**
@@ -251,6 +269,7 @@ public class RailroadInk {
         // FIXME Task 12: compute the total score including bonus points
         return -1;
     }
+
 
 }
 
