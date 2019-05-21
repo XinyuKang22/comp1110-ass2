@@ -143,7 +143,7 @@ public class Viewer extends Application {
         root.getChildren().add(placementGroup);
         root.getChildren().add(special);
         root.getChildren().add(round);
-        root.getChildren().add(roundButton);
+        //root.getChildren().add(roundButton);
         root.getChildren().add(tile);
         root.getChildren().add(alert);
         root.getChildren().add(dice);
@@ -221,7 +221,7 @@ public class Viewer extends Application {
             Button roundReminder = new Button("Round: "+roundNum);
             roundReminder.setLayoutX(650);
             roundReminder.setLayoutY(20);
-            Button boardStringViewer = new Button("Click to view boardString");
+            Button boardStringViewer = new Button("Click to view score");
             boardStringViewer.setLayoutX(810);
             boardStringViewer.setLayoutY(20);
             boardStringViewer.setOnMousePressed(e -> {
@@ -345,7 +345,7 @@ public class Viewer extends Application {
             useSpecial.setOnMousePressed(e -> {
                 tile.getChildren().remove(tileMoved);
                 special.getChildren().remove(specialPictures);
-                special.getChildren().add(specialTiles);
+                board.getChildren().add(specialTiles);
                 board.getChildren().remove(useSpecial);
             });
 
@@ -404,7 +404,7 @@ public class Viewer extends Application {
                         special.getChildren().remove(specialMoved);
                         specialTiles.getChildren().add(a);
                         a.backToOrigin();
-                        special.getChildren().add(specialTiles);
+                        board.getChildren().add(specialTiles);
                         Alert alert = new Alert(Alert.AlertType.INFORMATION);
                         alert.headerTextProperty().set("Invalid Special Placement!!");
                         alert.showAndWait();
@@ -454,9 +454,8 @@ public class Viewer extends Application {
         start.setOnMousePressed(event ->{
             displayRollingArea();
             displayBoard();
-            displaySpecials();
-
             begin.getChildren().clear();
+            displaySpecials();
             startRound();
         });
 
@@ -707,7 +706,7 @@ public class Viewer extends Application {
                 board.getChildren().add(new Grid(150+i*65,100+m*65,65));
             }
         }
-
+        board.getChildren().add(roundButton);
         Button back = new Button("Back");
         back.setLayoutX(20);
         back.setLayoutY(20);
