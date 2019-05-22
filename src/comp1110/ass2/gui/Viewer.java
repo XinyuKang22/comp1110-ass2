@@ -202,7 +202,7 @@ public class Viewer extends Application {
             boardString = "";
             availableSpecial.clear();
             remainingSpecial=6;
-            roundNum=0;
+            roundNum=1;
             countDice=0;
             moveTileRecord.clear();
             tiles.getChildren().clear();

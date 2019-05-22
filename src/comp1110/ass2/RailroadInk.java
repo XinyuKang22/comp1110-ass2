@@ -230,13 +230,7 @@ public class RailroadInk {
         return true;
 
     }
-
-
-    public static void main(String[] args) {
-        String a = "A1A30";
-        String b = "A1A2A3B0";
-        System.out.println(generateMove(a,b));
-    }
+    
 
     /**
      * Generate a random dice roll as a string of eight characters.

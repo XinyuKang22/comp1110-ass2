@@ -49,7 +49,8 @@ public class MultiplePlayers extends Viewer{
     private static Group alert = new Group();
     public static Group round = new Group();
     private static int specialRemaining = 6;
-
+    private static String diceResult = "";
+    private static String compSqu = "";
 
     public static void mulStart(){
         askPlayerName();
@@ -68,6 +69,8 @@ public class MultiplePlayers extends Viewer{
             finishGame();
         }else {
             countRound++;
+            diceResult = RailroadInk.generateDiceRoll();
+            compSqu = RailroadInk.generateMove(boardStringComp,diceResult);
             ImageView imageView = new ImageView();
             Image theRound = new Image(Viewer.class.getResource(URI_BASE+"round"+countRound+".png").toString());
             Timeline timeline = new Timeline(   new KeyFrame(
@@ -120,12 +123,13 @@ public class MultiplePlayers extends Viewer{
             timeline.play();
             timeline.setOnFinished(actionEvent -> {
                 board.getChildren().remove(imageView);
-                String diceResult = RailroadInk.generateDiceRoll();
                 String tileName = diceResult.substring(countDice*2,countDice*2+2);
                 tileGet = new DraggableTile(tileName,495,155);
                 board.getChildren().add(tileGet);
-                //String compPlaceSqu = RailroadInk.generateMove(boardStringComp,diceResult);
-                //String compPlacement = compPlaceSqu.substring(countDice*5,countDice*5+5);
+                String compPlacement = compSqu.substring(countDice*5,countDice*5+5); //为啥长度不够。。。
+                //假设comp没有special tile
+                Tile compTile = new Tile(compPlacement.substring(0,2),Integer.parseInt(compPlacement.substring(3,4))*50+620,(compPlacement.substring(2,3).hashCode()-65)*50+100,Integer.parseInt(compPlacement.substring(4,5))*90);
+                board.getChildren().add(compTile);
 
                 Button useSpecial = new Button("Use special tile");
                 useSpecial.setLayoutX(475);
