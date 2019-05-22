@@ -14,6 +14,7 @@ public class Scoring {
         int a = 0;
         for (int i = 0; i < boardString.length(); i = i + 5) {
             if(Board.isConnectedToExit(boardString.substring(i,i+5)) && (!inString(getExits(boardString,boardString.substring(i,i+5)), boardString.substring(i,i+5)))){
+                System.out.println(getExits(boardString,boardString.substring(i,i+5)));
                 a += Integer.valueOf(point[getExits(boardString,boardString.substring(i,i+5)).length()/5]);
             } }
 
@@ -117,5 +118,13 @@ public class Scoring {
                 if (!inString(a,boardString.substring(i,i+5)) && (RailroadInk.areConnectedNeighbours(tileString,boardString.substring(i,i+5))))
                 {a += boardString.substring(i,i+5) + getExits(boardString, boardString.substring(i,i+5));}}}
         return a;
+    }
+
+    public static void main(String[] args) {
+        String a = "A3D61A3D53B0C52A0B52A2B63A4D41B0E60A0F61A3D31A3D23A2G30B0F34A3E32A1B01B2B10A1B21A0A63A4D01A1G41B0G12S2D10A4C10B2A10A2B33A1A30S4E11A4E21A3C21A3C31S5F11";
+        String b = "A4A12B2B16A1B01A1B23S1B32A1A32B1B44B2A44A4C16A3D15A4D01A5D23A4E20B1F24A2F17A1F01B0G16A5C34A4C43A5C53A3D50A4D61S4E50A0F51A1F67S2E46B1E31A1F30A2G36A1G41B1G52";
+        for (int i = 0; i < a.length() -1 ; i += 5){
+            System.out.println(a.substring(i,i+5));}
+        System.out.println(countConnectedExits(b));
     }
 }
