@@ -181,11 +181,9 @@ public class RailroadInk {
 
 
     public static void main(String[] args) {
-        String a = "A3D61A3D53B0C52A0B52A2B63A4D41B0E60A0F61A3D31A3D23A2G30B0F34A3E32A1B01B2B10A1B21A0A63A4D01A1G41B0G12S2D10A4C10B2A10A2B33A1A30S4E11A4E21A3C21A3C31S5F11";
-        String b = "A3A10A3A52A3G10B2F10S1B50A2B61A0C60A1B41B1A35A4A41A2B31A1C30B0D32A2C50A4E10A3D12B2B10A2F01A0G00A4D01B1A27S3B20A4C10A1D50A0F23B2G25A3E30A4E41";
-        String[] c = {"B2A01"};
-        System.out.println(Board.hasConnectedNeighbors("A3A10", c));
-        System.out.println(generateMove(a,"A0A4A3B2"));
+        String a = "A1A30";
+        String b = "A1A2A3B0";
+        System.out.println(generateMove(a,b));
     }
 
     /**
