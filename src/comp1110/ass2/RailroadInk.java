@@ -1,6 +1,9 @@
 package comp1110.ass2;
 
 import comp1110.ass2.gui.Board;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Random;
 
 public class RailroadInk {
@@ -148,6 +151,10 @@ public class RailroadInk {
      */
     public static boolean isValidPlacementSequence(String boardString) {
 
+        if(boardString.isEmpty()){
+            return false;
+        }
+
         int listLength = boardString.length()/5;
         String[] tilesPlacementList = new String[listLength];
 
@@ -164,16 +171,61 @@ public class RailroadInk {
         for(int index = 1; index<tilesPlacementList.length; index++) {
 
             if(Board.isAtExit(tilesPlacementList[index])){
-                if(!Board.isConnectedToExit(tilesPlacementList[index])){
+                if(!Board.isConnectedToExit(tilesPlacementList[index]) || Board.isOverlap(tilesPlacementList[index],boardString.substring(0,index*5))){
                     return false;
                 }
             }else {
                 String[] previousPlacements = new String[index];
                 System.arraycopy(tilesPlacementList, 0, previousPlacements, 0, index);
-                if (!Board.hasConnectedNeighbors(tilesPlacementList[index], previousPlacements)) {
+                if (!Board.hasConnectedNeighbors(tilesPlacementList[index], previousPlacements) ||Board.isOverlap(tilesPlacementList[index],boardString.substring(0,index*5)) ) {
                     return false;
                 }
             }
+            HashMap<String,Integer> allNeighbors = new HashMap<>();
+            for(String s:tilesPlacementList){
+                if(s.equals(tilesPlacementList[index])){
+                    break;
+                }else {
+                    if(Board.areNeighbors(tilesPlacementList[index],s)){
+                        allNeighbors.put(s,Board.relativePosition(tilesPlacementList[index],s));
+                    }
+                }
+            }
+            String[] a = Board.rotatedTileInfo(tilesPlacementList[index]);
+            for(String placement:allNeighbors.keySet()){
+                String[] b = Board.rotatedTileInfo(placement);
+                switch (allNeighbors.get(placement)){
+                    case 0:
+                        if(a[0].equals("Highway") && b[2].equals("Railway")){
+                            return false;
+                        }else if( a[0].equals("Railway") && b[2].equals("Highway")){
+                            return false;
+                        }
+                        break;
+                    case 1:
+                        if(a[1].equals("Highway") && b[3].equals("Railway")){
+                            return false;
+                        }else if( a[1].equals("Railway") && b[3].equals("Highway")){
+                            return false;
+                        }
+                        break;
+                    case 2:
+                        if(a[2].equals("Highway") && b[0].equals("Railway")){
+                            return false;
+                        }else if( a[2].equals("Railway") && b[0].equals("Highway")){
+                            return false;
+                        }
+                        break;
+                    case 3:
+                        if(a[3].equals("Highway") && b[1].equals("Railway")){
+                            return false;
+                        }else if( a[3].equals("Railway") && b[1].equals("Highway")){
+                            return false;
+                        }
+                        break;
+                }
+            }
+
         }
         return true;
 
