@@ -64,76 +64,8 @@ public class Viewer extends Application {
     private DraggableTile tileMoved;
     private DraggableTile specialMoved = null;
     private Group specialPictures = new Group();
+    private Group tiles = new Group();
 
-    private ArrayList<ImageView> specialPics(){
-        ArrayList<ImageView> toReturn = new ArrayList<>();
-        DraggableTile[] a = {tileS0, tileS1, tileS2, tileS3, tileS4, tileS5};
-        for(DraggableTile tile:a){
-            int i = Integer.parseInt(tile.tileName.substring(1,2));
-            ImageView imageView = new ImageView(Viewer.class.getResource(URI_BASE+tile.tileName+".png").toString());
-            imageView.setFitHeight(65);
-            imageView.setFitWidth(65);
-            if(i<3){
-                imageView.setLayoutX(700+i*75);
-                imageView.setLayoutY(150);
-            }else {
-                imageView.setLayoutX(700+(i-3)*75);
-                imageView.setLayoutY(150+75);
-            }
-            imageView.setOnMouseClicked(e -> {
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setHeaderText("This special tile is locked. ");
-                alert.showAndWait();
-            });
-            toReturn.add(imageView);
-        }
-        return toReturn;
-    }
-
-    private ArrayList<ImageView> specialImages(DraggableTile tileClicked){
-        ArrayList<ImageView> toReturn = new ArrayList<>();
-        for(DraggableTile tile:availableSpecial){
-            if(!tile.tileName.equals(tileClicked.tileName)){
-                int i = Integer.parseInt(tile.tileName.substring(1,2));
-                ImageView imageView = new ImageView(Viewer.class.getResource(URI_BASE+tile.tileName+".png").toString());
-                imageView.setFitHeight(65);
-                imageView.setFitWidth(65);
-                if(i<3){
-                    imageView.setLayoutX(700+i*75);
-                    imageView.setLayoutY(150);
-                }else {
-                    imageView.setLayoutX(700+(i-3)*75);
-                    imageView.setLayoutY(150+75);
-                }
-                imageView.setOnMouseClicked(e -> {
-                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                    alert.setHeaderText("This special tile is locked. ");
-                    alert.showAndWait();
-                });
-                toReturn.add(imageView);
-            }
-        }
-        return toReturn;
-    }
-
-    private void finishGame(){
-        special.getChildren().clear();
-        int basicScore = RailroadInk.getBasicScore(boardString);
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("You have finished the game!!");
-        alert.setHeaderText("Your basic score is:  "+basicScore);
-        alert.showAndWait();
-        Button score = new Button("Your basic score is :    "+basicScore);
-        score.setLayoutX(750);
-        score.setLayoutY(200);
-        Text t = new Text();
-        t.setText("GOOD JOB! ");
-        t.setX(750);
-        t.setY(250);
-        t.setFill(RED);
-        special.getChildren().add(score);
-        special.getChildren().add(t);
-    }
     @Override
     public void start(Stage primaryStage) throws Exception {
         primaryStage.setTitle("Railroad Ink");
@@ -143,60 +75,59 @@ public class Viewer extends Application {
         root.getChildren().add(placementGroup);
         root.getChildren().add(special);
         root.getChildren().add(round);
-        //root.getChildren().add(roundButton);
         root.getChildren().add(tile);
         root.getChildren().add(alert);
         root.getChildren().add(dice);
         root.getChildren().add(begin);
         root.getChildren().add(stringShow);
-        //root.getChildren().add(specialTiles);
+        root.getChildren().add(tiles);
         displayBeginPage();
         primaryStage.setScene(scene);
         primaryStage.show();
     }
 
+    void displayBeginPage(){
+        ImageView logo = new ImageView(Viewer.class.getResource(URI_BASE+"LOGO.png").toString());
+        logo.setFitWidth(900);
+        logo.setFitHeight(700);
+        logo.setLayoutX(0);
+        logo.setLayoutY(0);
 
-    /**
-     * Draw a placement in the window, removing any previously drawn one
-     *
-     * @param placement A valid placement string
-     */
-    void makePlacement(String placement) {
-        if(!RailroadInk.isBoardStringWellFormed(placement)){
-            throw new IllegalArgumentException("Illegal Board String");
-        }
-       for(int i=0; i<placement.length(); i+=5){
+        Button start  = new Button("SOLO game ! ");
+        start.setLayoutX(800);
+        start.setLayoutY(450);
+        start.setOnMousePressed(event ->{
+            displayRollingArea();
+            initRollingArea();
+            displayBoard();
+            begin.getChildren().clear();
+            initSpecials();
+            startRound();
+        });
 
-           String tile = placement.substring(i,i+2);
-           int rowPosition = (placement.substring(i+2,i+3).hashCode()-65)*65+100;
-           int colPosition = Integer.parseInt(placement.substring(i+3,i+4))*65+150;
-           int orientation = Integer.parseInt(placement.substring(i+4,i+5));
-           int angle;
-           if(orientation<4){
-               angle = orientation*90;
-           }else {
-               angle = (orientation-4)*90;
-           }
+        Button startMul = new Button("Against Computer ! ");
+        startMul.setLayoutX(800);
+        startMul.setLayoutY(500);
+        startMul.setOnMousePressed(e -> {
+            root.getChildren().remove(begin);
+            MultiplePlayers.mulStart();
+        });
 
-           ImageView img = new ImageView();
-           img.setImage(new Image(Viewer.class.getResource(URI_BASE+tile+".png").toString()));
-           img.setRotate(angle);
-           if(orientation>=4){
-               img.setScaleX(-1);
-           }
-           img.setFitWidth(65);
-           img.setFitHeight(65);
-           img.setPreserveRatio(true);
-           img.setSmooth(true);
-           HBox hBox = new HBox();
-           hBox.getChildren().add(img);
-           placementGroup.getChildren().add(hBox);
-           hBox.setLayoutX(colPosition);
-           hBox.setLayoutY(rowPosition);
-       }
+        Button view = new Button("Placement Viewer");
+        view.setLayoutX(800);
+        view.setLayoutY(550);
+        view.setOnMousePressed(event ->{
+            inputArea();
+            displayBoard();
+            begin.getChildren().clear();
+        });
+
+        begin.getChildren().add(start);
+        begin.getChildren().add(view);
+        begin.getChildren().add(startMul);
+        begin.getChildren().add(logo);
+
     }
-
-
 
     private void startRound(){
         if(roundNum==8){
@@ -234,19 +165,112 @@ public class Viewer extends Application {
         }
     }
 
-    void displayRollingArea(){
-        ImageView lockedSpecial = new ImageView(Viewer.class.getResource(URI_BASE+"lockedSpecial.png").toString());
-        lockedSpecial.setFitWidth(215);
-        lockedSpecial.setFitHeight(140);
-        lockedSpecial.setLayoutX(700);
-        lockedSpecial.setLayoutY(150);
-
-        //special.getChildren().add(lockedSpecial);
-        for(ImageView specialPic:specialPics()){
-            specialPictures.getChildren().add(specialPic);
+    private void displayBoard() {
+        for(int i=0; i<7; i++){
+            for(int m=0; m<7; m++){
+                board.getChildren().add(new Grid(150+i*65,100+m*65,65));
+            }
         }
-        special.getChildren().add(specialPictures);
+        board.getChildren().add(roundButton);
+        Button back = new Button("Back");
+        back.setLayoutX(20);
+        back.setLayoutY(20);
+        back.setOnMousePressed(e -> {    //back 仍然有很多问题！！！！！！
+            controls.getChildren().clear();
+            placementGroup.getChildren().clear();
+            board.getChildren().clear();
+            special.getChildren().clear();
+            dice.getChildren().clear();
+            stringShow.getChildren().clear();
+            roundButton.getChildren().clear();
+            tile.getChildren().clear();
+            alert.getChildren().clear();
+            boardString = "";
+            availableSpecial.clear();
+            remainingSpecial=6;
+            moveTileRecord.clear();
+            tiles.getChildren().clear();
+            specialTiles.getChildren().clear();
+            specialMoved=null;
+            tileMoved=null;
 
+            displayBeginPage();
+        });
+        board.getChildren().add(back);
+        initGrids();
+    }
+
+
+    private void finishGame(){
+        special.getChildren().clear();
+        int basicScore = RailroadInk.getBasicScore(boardString);
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("You have finished the game!!");
+        alert.setHeaderText("Your basic score is:  "+basicScore);
+        alert.showAndWait();
+        Button score = new Button("Your basic score is :    "+basicScore);
+        score.setLayoutX(750);
+        score.setLayoutY(500);
+        Text t = new Text();
+        t.setText("GOOD JOB! ");
+        t.setX(750);
+        t.setY(550);
+        t.setFill(RED);
+        special.getChildren().add(score);
+        special.getChildren().add(t);
+    }
+
+    private ArrayList<ImageView> specialPics(){   //return all special tiles pictures
+        ArrayList<ImageView> toReturn = new ArrayList<>();
+        DraggableTile[] a = {tileS0, tileS1, tileS2, tileS3, tileS4, tileS5};
+        for(DraggableTile tile:a){
+            int i = Integer.parseInt(tile.tileName.substring(1,2));
+            ImageView imageView = new ImageView(Viewer.class.getResource(URI_BASE+tile.tileName+".png").toString());
+            imageView.setFitHeight(65);
+            imageView.setFitWidth(65);
+            if(i<3){
+                imageView.setLayoutX(700+i*75);
+                imageView.setLayoutY(150);
+            }else {
+                imageView.setLayoutX(700+(i-3)*75);
+                imageView.setLayoutY(150+75);
+            }
+            imageView.setOnMouseClicked(e -> {
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setHeaderText("This special tile is locked. ");
+                alert.showAndWait();
+            });
+            toReturn.add(imageView);
+        }
+        return toReturn;
+    }
+
+    private ArrayList<ImageView> specialImages(DraggableTile tileClicked){ //return all special pictures expect the one clicked
+        ArrayList<ImageView> toReturn = new ArrayList<>();
+        for(DraggableTile tile:availableSpecial){
+            if(!tile.tileName.equals(tileClicked.tileName)){
+                int i = Integer.parseInt(tile.tileName.substring(1,2));
+                ImageView imageView = new ImageView(Viewer.class.getResource(URI_BASE+tile.tileName+".png").toString());
+                imageView.setFitHeight(65);
+                imageView.setFitWidth(65);
+                if(i<3){
+                    imageView.setLayoutX(700+i*75);
+                    imageView.setLayoutY(150);
+                }else {
+                    imageView.setLayoutX(700+(i-3)*75);
+                    imageView.setLayoutY(150+75);
+                }
+                imageView.setOnMouseClicked(e -> {
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setHeaderText("This special tile is locked. ");
+                    alert.showAndWait();
+                });
+                toReturn.add(imageView);
+            }
+        }
+        return toReturn;
+    }
+    void initRollingArea(){
         Rectangle rectangle1 = new Rectangle();
         rectangle1.setHeight(10);
         rectangle1.setWidth(75*4+10);
@@ -290,37 +314,14 @@ public class Viewer extends Application {
         rectangle7.setY(400-10);
 
         special.getChildren().addAll(rectangle1,rectangle2,rectangle3,rectangle4,rectangle5,rectangle6,rectangle7);
+    }
 
-        ImageView imageView0 = new ImageView(Viewer.class.getResource(URI_BASE+"dieA.gif").toString());
-        ImageView imageView1 = new ImageView(Viewer.class.getResource(URI_BASE+"dieA.gif").toString());
-        ImageView imageView2 = new ImageView(Viewer.class.getResource(URI_BASE+"dieA.gif").toString());
-        ImageView imageView3 = new ImageView(Viewer.class.getResource(URI_BASE+"dieA.gif").toString());
-        ImageView[] diceRolling = new ImageView[4];
-        diceRolling[0] = imageView0;
-        diceRolling[1] = imageView1;
-        diceRolling[2] = imageView2;
-        diceRolling[3] = imageView3;
+    void displayRollingArea(){
 
-        imageView0.setLayoutX(700);
-        imageView0.setLayoutY(400);
-        imageView0.setFitWidth(65);
-        imageView0.setFitHeight(65);
-        imageView0.setScaleX(-1);
-        imageView1.setLayoutX(700+75);
-        imageView1.setLayoutY(400);
-        imageView1.setFitWidth(65);
-        imageView1.setFitHeight(65);
-        imageView1.setScaleY(-1);
-        imageView2.setLayoutX(700+75*2);
-        imageView2.setLayoutY(400);
-        imageView2.setFitWidth(65);
-        imageView2.setFitHeight(65);
-        imageView2.setScaleX(-1);
-        imageView2.setScaleY(-1);
-        imageView3.setLayoutX(700+75*3+5);
-        imageView3.setLayoutY(400+5);
-        imageView3.setFitWidth(55);
-        imageView3.setFitHeight(55);
+        for(ImageView specialPic:specialPics()){
+            specialPictures.getChildren().add(specialPic);
+        }
+        special.getChildren().add(specialPictures);
 
         Button roll = new Button("Roll");
         roll.setLayoutX(750);
@@ -329,7 +330,12 @@ public class Viewer extends Application {
         stop.setLayoutX(750+75*2);
         stop.setLayoutY(500);
         roll.setOnMousePressed(event -> {
-            dice.getChildren().add(diceRolling[countDice]);
+            ImageView theDice = new ImageView(Viewer.class.getResource(URI_BASE+"dieA.gif").toString());
+            theDice.setFitWidth(65);
+            theDice.setFitHeight(65);
+            theDice.setLayoutX(700+countDice*75);
+            theDice.setLayoutY(400);
+            dice.getChildren().add(theDice);
         });
         stop.setOnMousePressed(event -> {
             dice.getChildren().clear();
@@ -344,7 +350,7 @@ public class Viewer extends Application {
             useSpecial.setOnMousePressed(e -> {
                 tile.getChildren().remove(tileMoved);
                 special.getChildren().remove(specialPictures);
-                board.getChildren().add(specialTiles);
+                tiles.getChildren().add(specialTiles);
                 board.getChildren().remove(useSpecial);
             });
 
@@ -353,7 +359,7 @@ public class Viewer extends Application {
             makePlacement.setLayoutY(560);
             makePlacement.setOnMousePressed(e ->{
                 String placementString;
-                if(specialMoved==null){
+                if(specialMoved==null){  //placed a normal tile
                     placementString = tileMoved.getPlacementString();
                     if(RailroadInk.isValidPlacementSequence(boardString+placementString) &&!Board.isOverlap(placementString,boardString)){
                         makePlacement(placementString);
@@ -374,7 +380,7 @@ public class Viewer extends Application {
                         alert.headerTextProperty().set("Invalid Placement!!");
                         alert.showAndWait();
                     }
-                }else {
+                }else {  //placed a special tile
                     placementString = specialMoved.getPlacementString();
                     if(RailroadInk.isValidPlacementSequence(boardString+placementString)&&!Board.isOverlap(placementString,boardString)){
                         makePlacement(placementString);
@@ -403,7 +409,7 @@ public class Viewer extends Application {
                         special.getChildren().remove(specialMoved);
                         specialTiles.getChildren().add(a);
                         a.backToOrigin();
-                        board.getChildren().add(specialTiles);
+                        tiles.getChildren().add(specialTiles);
                         Alert alert = new Alert(Alert.AlertType.INFORMATION);
                         alert.headerTextProperty().set("Invalid Special Placement!!");
                         alert.showAndWait();
@@ -424,7 +430,7 @@ public class Viewer extends Application {
     }
 
 
-    void displaySpecials(){
+    void initSpecials(){
         availableSpecial.add(tileS0);
         availableSpecial.add(tileS1);
         availableSpecial.add(tileS2);
@@ -440,299 +446,7 @@ public class Viewer extends Application {
         specialTiles.getChildren().add(tileS5);
     }
 
-    void displayBeginPage(){
-        ImageView logo = new ImageView(Viewer.class.getResource(URI_BASE+"LOGO.png").toString());
-        logo.setFitWidth(900);
-        logo.setFitHeight(700);
-        logo.setLayoutX(0);
-        logo.setLayoutY(0);
-
-        Button start  = new Button("SOLO game ! ");
-        start.setLayoutX(800);
-        start.setLayoutY(450);
-        start.setOnMousePressed(event ->{
-            displayRollingArea();
-            displayBoard();
-            begin.getChildren().clear();
-            displaySpecials();
-            startRound();
-        });
-
-        Button startMul = new Button("Against Computer ! ");
-        startMul.setLayoutX(800);
-        startMul.setLayoutY(500);
-        startMul.setOnMousePressed(e -> {
-            root.getChildren().remove(begin);
-            MultiplePlayers.mulStart(root);
-        });
-
-        Button view = new Button("Placement Viewer");
-        view.setLayoutX(800);
-        view.setLayoutY(550);
-        view.setOnMousePressed(event ->{
-            inputArea();
-            displayBoard();
-            begin.getChildren().clear();
-        });
-
-
-        begin.getChildren().add(start);
-        begin.getChildren().add(view);
-        begin.getChildren().add(startMul);
-        begin.getChildren().add(logo);
-
-    }
-
-
-    class Tile extends ImageView {
-        double x,y;
-        String tileName;
-        Viewer viewer;
-        Tile(String tileName, double x, double y){
-            this.x = x;
-            this.y = y;
-            this.tileName=tileName;
-            this.setImage(new Image(Viewer.class.getResource(URI_BASE+tileName+".png").toString()));
-            this.setFitHeight(65);
-            this.setFitWidth(65);
-            this.setLayoutX(x);
-            this.setLayoutY(y);
-            this.toFront();
-
-        }
-    }
-
-    class DraggableTile extends Tile {
-        private double x,y;
-        private double mouseX, mouseY;
-        private Viewer viewer;
-        private int rotate=0;
-        String gridName = "__";
-
-        void lockOthers(){
-            if(this.tileName.substring(0,1).equals("S")){
-                if(specialMoved==null){
-                    specialMoved=this;
-                    special.getChildren().add(this);
-                    special.getChildren().remove(specialTiles);
-                    specialPictures.getChildren().clear();
-                    for(ImageView imageView:specialImages(this)){
-                        specialPictures.getChildren().add(imageView);
-                    }
-                    special.getChildren().add(specialPictures);
-                }
-
-            }
-        }
-
-        void rotate(){
-            rotate=rotate+90;
-            if(rotate<=270){
-                this.setRotate(rotate);
-            }else if(rotate<=630){
-                this.setRotate(0);
-                this.setScaleX(-1);
-                this.setRotate(rotate-360);
-            }else {
-                rotate=0;
-                this.setRotate(rotate);
-                this.setScaleX(1);
-            }
-        }
-
-        void alertError(){
-            Rectangle up = new Rectangle();
-            Rectangle down = new Rectangle();
-            Rectangle left = new Rectangle();
-            Rectangle right = new Rectangle();
-            Rectangle[] allRec = {up,down,left,right};
-            for(Rectangle rec:allRec){
-                rec.setFill(RED);
-            }
-            up.setWidth(75);
-            up.setHeight(5);
-            up.setX(this.getLayoutX()-5);
-            up.setY(this.getLayoutY()-5);
-            down.setWidth(75);
-            down.setHeight(5);
-            down.setX(this.getLayoutX()-5);
-            down.setY(this.getLayoutY()+65);
-            left.setWidth(5);
-            left.setHeight(75);
-            left.setX(this.getLayoutX()-5);
-            left.setY(this.getLayoutY()-5);
-            right.setWidth(5);
-            right.setHeight(75);
-            right.setX(this.getLayoutX()+65);
-            right.setY(this.getLayoutY()-5);
-
-            alert.getChildren().addAll(up,down,left,right);
-        }
-
-        void backToOrigin(){  //can only use on special tiles
-            int i = Integer.parseInt(this.tileName.substring(1,2));
-            if(i<3){
-                this.setLayoutX(700+i*75);
-                this.setLayoutY(150);
-            }else {
-                this.setLayoutX(700+(i-3)*75);
-                this.setLayoutY(150+75);
-            }
-            this.setRotate(0);
-            this.setScaleX(1);
-            specialMoved=null;
-        }
-
-        String getPlacementString(){
-            return tileName+gridName+rotate/90;
-        }
-
-        DraggableTile(String tileName, double x, double y, Viewer viewer){
-            super(tileName,x,y);
-            this.x = x;
-            this.y = y;
-            this.viewer=viewer;
-
-            this.setOnScroll(event -> {
-                this.rotate();
-            });
-            this.setOnMousePressed(event -> {
-                this.mouseX = event.getSceneX();
-                this.mouseY = event.getSceneY();
-                this.x = super.getLayoutX();
-                this.y = super.getLayoutY();
-                this.toFront();
-                stringShow.getChildren().clear();
-                alert.getChildren().clear();
-            });
-            this.setOnMouseDragged(event -> {
-                this.setLayoutX(this.x+ event.getSceneX() - mouseX);
-                this.setLayoutY(this.y+  event.getSceneY() - mouseY);
-            });
-            this.setOnMouseReleased(event -> {
-                double xFitted = nearestGrid(this.getLayoutX(),this.getLayoutY())[0];
-                double yFitted = nearestGrid(this.getLayoutX(),this.getLayoutY())[1];
-                this.setLayoutX(xFitted);
-                this.setLayoutY(yFitted);
-
-                double theX = this.getLayoutX();
-                double theY = this.getLayoutY();
-                double a=150;
-                double b=100;
-                double min = 65*65*2;
-
-                for(String key:theBoardGrid().keySet()){
-                    int gridX = theBoardGrid().get(key)[0];
-                    int gridY = theBoardGrid().get(key)[1];
-                    double xSquare = (theX-gridX)*(theX-gridX);
-                    double ySquare = (theY-gridY)*(theY-gridY);
-                    if(xSquare+ySquare<min){
-                        a = gridX;
-                        b = gridY;
-                        min = xSquare+ySquare;
-                        gridName=key;
-                    }
-                }
-                if(min<65*65*2){
-                    this.setLayoutX(a);
-                    this.setLayoutY(b);
-                }else {
-                    this.setLayoutX(x);
-                    this.setLayoutY(y);
-                }
-                lockOthers();
-            });
-        }
-    }
-
-    double[] nearestGrid(double x, double y){
-        double[] nearest = new double[2];
-        double min = 65*65*2;
-        for(int[] location:gridLocation()){
-            double xSquare = (x-location[0])*(x-location[0]);
-            double ySquare = (y-location[1])*(y-location[1]);
-            if(xSquare+ySquare<min){
-                nearest[0] = location[0];
-                nearest[1] = location[1];
-                min = xSquare+ySquare;
-            }
-        }
-        if(min>=65*65*2){
-            nearest[0] = x;
-            nearest[1] = y;
-        }
-        return nearest;
-    }
-
-    public int[][] gridLocation(){
-        int[][] list = new int[49][2];
-        int count = 0;
-        for(int i=0; i<7; i++){
-            for(int m=0; m<7; m++){
-                list[count][0]=150+m*65;
-                list[count][1]=100+i*65;
-                count++;
-            }
-        }
-        return list;
-    }
-
-    public HashMap<String,int[]> theBoardGrid(){
-        HashMap<String,int[]> locations = new HashMap<>();
-        int[][] locationValue = gridLocation();
-        String[] locationString = Board.grid;
-        for(int i=0; i<49; i++){
-            locations.put(locationString[i],locationValue[i]);
-        }
-        return locations;
-    }
-
-    public static class Grid extends Rectangle {
-        double x,y;
-        double size;
-        public Grid(double x, double y, double size){
-            this.x=x;
-            this.y=y;
-            this.size=size;
-            this.setWidth(size);
-            this.setHeight(size);
-            this.setLayoutX(x);
-            this.setLayoutY(y);
-            this.setFill(BEIGE);
-            this.setStroke(BLACK);
-        }
-    }
-
-    private void displayBoard() {
-        for(int i=0; i<7; i++){
-            for(int m=0; m<7; m++){
-                board.getChildren().add(new Grid(150+i*65,100+m*65,65));
-            }
-        }
-        board.getChildren().add(roundButton);
-        Button back = new Button("Back");
-        back.setLayoutX(20);
-        back.setLayoutY(20);
-        back.setOnMousePressed(e -> {
-            controls.getChildren().clear();
-            placementGroup.getChildren().clear();
-            board.getChildren().clear();
-            special.getChildren().clear();
-            dice.getChildren().clear();
-            stringShow.getChildren().clear();
-            roundButton.getChildren().clear();
-            tile.getChildren().clear();
-            alert.getChildren().clear();
-            boardString = "";
-            availableSpecial.clear();
-            remainingSpecial=6;
-            moveTileRecord.clear();
-            //specialTiles.getChildren().clear();
-
-            displayBeginPage();
-        });
-        board.getChildren().add(back);
-
+    void initGrids(){
         ImageView exitB0 = new ImageView();
         exitB0.setImage(new Image(Viewer.class.getResource(URI_BASE+"RailExit.png").toString()));
         exitB0.setFitHeight(65);
@@ -837,9 +551,227 @@ public class Viewer extends Application {
         exitG5.setLayoutX(150+65*5);
         exitG5.setLayoutY(100+65*7);
         board.getChildren().add(exitG5);
+    }
+
+
+    class Tile extends ImageView {
+        double x,y;
+        String tileName;
+        Viewer viewer;
+        Tile(String tileName, double x, double y){
+            this.x = x;
+            this.y = y;
+            this.tileName=tileName;
+            this.setImage(new Image(Viewer.class.getResource(URI_BASE+tileName+".png").toString()));
+            this.setFitHeight(65);
+            this.setFitWidth(65);
+            this.setLayoutX(x);
+            this.setLayoutY(y);
+            this.toFront();
+
+        }
+    }
+
+    class DraggableTile extends Tile {
+        private double x,y;
+        private double mouseX, mouseY;
+        private Viewer viewer;
+        private int rotate=0;
+        String gridName = "__";
+
+        DraggableTile(String tileName, double x, double y, Viewer viewer){
+            super(tileName,x,y);
+            this.x = x;
+            this.y = y;
+            this.viewer=viewer;
+
+            this.setOnScroll(event -> {
+                this.rotate();
+            });
+            this.setOnMousePressed(event -> {
+                this.mouseX = event.getSceneX();
+                this.mouseY = event.getSceneY();
+                this.x = super.getLayoutX();
+                this.y = super.getLayoutY();
+                this.toFront();
+                stringShow.getChildren().clear();
+                alert.getChildren().clear();
+            });
+            this.setOnMouseDragged(event -> {
+                this.setLayoutX(this.x+ event.getSceneX() - mouseX);
+                this.setLayoutY(this.y+  event.getSceneY() - mouseY);
+            });
+            this.setOnMouseReleased(event -> {
+                double xFitted = nearestGrid(this.getLayoutX(),this.getLayoutY())[0];
+                double yFitted = nearestGrid(this.getLayoutX(),this.getLayoutY())[1];
+                this.setLayoutX(xFitted);
+                this.setLayoutY(yFitted);
+
+                double theX = this.getLayoutX();
+                double theY = this.getLayoutY();
+                double a=150;
+                double b=100;
+                double min = 65*65*2;
+
+                for(String key:theBoardGrid().keySet()){
+                    int gridX = theBoardGrid().get(key)[0];
+                    int gridY = theBoardGrid().get(key)[1];
+                    double xSquare = (theX-gridX)*(theX-gridX);
+                    double ySquare = (theY-gridY)*(theY-gridY);
+                    if(xSquare+ySquare<min){
+                        a = gridX;
+                        b = gridY;
+                        min = xSquare+ySquare;
+                        gridName=key;
+                    }
+                }
+                if(min<65*65*2){
+                    this.setLayoutX(a);
+                    this.setLayoutY(b);
+                }else {
+                    this.setLayoutX(x);
+                    this.setLayoutY(y);
+                }
+                lockOthers();
+            });
+        }
+        void lockOthers(){
+            if(this.tileName.substring(0,1).equals("S")){
+                if(specialMoved==null){
+                    specialMoved=this;
+                    special.getChildren().add(this);
+                    tiles.getChildren().remove(specialTiles);
+                    specialPictures.getChildren().clear();
+                    for(ImageView imageView:specialImages(this)){
+                        specialPictures.getChildren().add(imageView);
+                    }
+                    special.getChildren().add(specialPictures);
+                }
+
+            }
+        }
+
+        String getPlacementString(){
+            return tileName+gridName+rotate/90;
+        }
+
+        void rotate(){
+            rotate=rotate+90;
+            if(rotate<=270){
+                this.setRotate(rotate);
+            }else if(rotate<=630){
+                this.setRotate(0);
+                this.setScaleX(-1);
+                this.setRotate(rotate-360);
+            }else {
+                rotate=0;
+                this.setRotate(rotate);
+                this.setScaleX(1);
+            }
+        }
+
+        void alertError(){
+            Rectangle up = new Rectangle();
+            Rectangle down = new Rectangle();
+            Rectangle left = new Rectangle();
+            Rectangle right = new Rectangle();
+            Rectangle[] allRec = {up,down,left,right};
+            for(Rectangle rec:allRec){
+                rec.setFill(RED);
+            }
+            up.setWidth(75);
+            up.setHeight(5);
+            up.setX(this.getLayoutX()-5);
+            up.setY(this.getLayoutY()-5);
+            down.setWidth(75);
+            down.setHeight(5);
+            down.setX(this.getLayoutX()-5);
+            down.setY(this.getLayoutY()+65);
+            left.setWidth(5);
+            left.setHeight(75);
+            left.setX(this.getLayoutX()-5);
+            left.setY(this.getLayoutY()-5);
+            right.setWidth(5);
+            right.setHeight(75);
+            right.setX(this.getLayoutX()+65);
+            right.setY(this.getLayoutY()-5);
+
+            alert.getChildren().addAll(up,down,left,right);
+        }
+
+        void backToOrigin(){  //can only use on special tiles
+            int i = Integer.parseInt(this.tileName.substring(1,2));
+            if(i<3){
+                this.setLayoutX(700+i*75);
+                this.setLayoutY(150);
+            }else {
+                this.setLayoutX(700+(i-3)*75);
+                this.setLayoutY(150+75);
+            }
+            this.setRotate(0);
+            this.setScaleX(1);
+            specialMoved=null;
+        }
 
     }
 
+    double[] nearestGrid(double x, double y){
+        double[] nearest = new double[2];
+        double min = 65*65*2;
+        for(int[] location:gridLocation()){
+            double xSquare = (x-location[0])*(x-location[0]);
+            double ySquare = (y-location[1])*(y-location[1]);
+            if(xSquare+ySquare<min){
+                nearest[0] = location[0];
+                nearest[1] = location[1];
+                min = xSquare+ySquare;
+            }
+        }
+        if(min>=65*65*2){
+            nearest[0] = x;
+            nearest[1] = y;
+        }
+        return nearest;
+    }
+
+    int[][] gridLocation(){
+        int[][] list = new int[49][2];
+        int count = 0;
+        for(int i=0; i<7; i++){
+            for(int m=0; m<7; m++){
+                list[count][0]=150+m*65;
+                list[count][1]=100+i*65;
+                count++;
+            }
+        }
+        return list;
+    }
+
+    HashMap<String,int[]> theBoardGrid(){
+        HashMap<String,int[]> locations = new HashMap<>();
+        int[][] locationValue = gridLocation();
+        String[] locationString = Board.grid;
+        for(int i=0; i<49; i++){
+            locations.put(locationString[i],locationValue[i]);
+        }
+        return locations;
+    }
+
+    class Grid extends Rectangle {
+        double x,y;
+        double size;
+        public Grid(double x, double y, double size){
+            this.x=x;
+            this.y=y;
+            this.size=size;
+            this.setWidth(size);
+            this.setHeight(size);
+            this.setLayoutX(x);
+            this.setLayoutY(y);
+            this.setFill(BEIGE);
+            this.setStroke(BLACK);
+        }
+    }
 
     /**
      * Create a basic text field for input and a refresh button.
@@ -874,11 +806,45 @@ public class Viewer extends Application {
         controls.getChildren().add(button2);
     }
 
-    void showPlacementString(String placementString){
-        Button toShow = new Button(placementString);
-        toShow.setLayoutX(100);
-        toShow.setLayoutY(100);
-        stringShow.getChildren().add(toShow);
+
+    /**
+     * Draw a placement in the window, removing any previously drawn one
+     *
+     * @param placement A valid placement string
+     */
+    void makePlacement(String placement) {
+        if(!RailroadInk.isBoardStringWellFormed(placement)){
+            throw new IllegalArgumentException("Illegal Board String");
+        }
+        for(int i=0; i<placement.length(); i+=5){
+
+            String tile = placement.substring(i,i+2);
+            int rowPosition = (placement.substring(i+2,i+3).hashCode()-65)*65+100;
+            int colPosition = Integer.parseInt(placement.substring(i+3,i+4))*65+150;
+            int orientation = Integer.parseInt(placement.substring(i+4,i+5));
+            int angle;
+            if(orientation<4){
+                angle = orientation*90;
+            }else {
+                angle = (orientation-4)*90;
+            }
+
+            ImageView img = new ImageView();
+            img.setImage(new Image(Viewer.class.getResource(URI_BASE+tile+".png").toString()));
+            img.setRotate(angle);
+            if(orientation>=4){
+                img.setScaleX(-1);
+            }
+            img.setFitWidth(65);
+            img.setFitHeight(65);
+            img.setPreserveRatio(true);
+            img.setSmooth(true);
+            HBox hBox = new HBox();
+            hBox.getChildren().add(img);
+            placementGroup.getChildren().add(hBox);
+            hBox.setLayoutX(colPosition);
+            hBox.setLayoutY(rowPosition);
+        }
     }
 
 }
