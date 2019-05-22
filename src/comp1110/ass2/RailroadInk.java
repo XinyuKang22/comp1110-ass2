@@ -197,12 +197,11 @@ public class RailroadInk {
      * @return a String representing the die roll e.g. A0A4A3B2
      */
     public static String generateDiceRoll() {
-        int result, result1, result2, result3 = 0;
         Random r = new Random();
-        result = r.nextInt(5);
-        result1 = r.nextInt(5);
-        result2 = r.nextInt(5);
-        result3 = r.nextInt(2);
+        int result = r.nextInt(5);
+        int result1 = r.nextInt(5);
+        int result2 = r.nextInt(5);
+        int result3 = r.nextInt(2);
         String dice = "A" + Integer.toString(result) + "A" +  Integer.toString(result1) + "A" +  Integer.toString(result2) +"B" + Integer.toString(result3);
         return dice;
     }
