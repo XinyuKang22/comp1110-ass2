@@ -230,7 +230,7 @@ public class RailroadInk {
         return true;
 
     }
-    
+
 
     /**
      * Generate a random dice roll as a string of eight characters.
