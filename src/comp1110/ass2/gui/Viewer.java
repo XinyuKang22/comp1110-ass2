@@ -67,7 +67,7 @@ public class Viewer extends Application {
     private Group tiles = new Group();
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage) throws Exception {   //start the game
         primaryStage.setTitle("Railroad Ink");
         Scene scene = new Scene(root, VIEWER_WIDTH,VIEWER_HEIGHT, Color.BEIGE);
         root.getChildren().add(board);
@@ -86,14 +86,18 @@ public class Viewer extends Application {
         primaryStage.show();
     }
 
-    void displayBeginPage(){
+
+    void displayBeginPage(){   // begin page with game logo and three game options
+
+        //set up the logo
         ImageView logo = new ImageView(Viewer.class.getResource(URI_BASE+"LOGO.png").toString());
         logo.setFitWidth(900);
         logo.setFitHeight(700);
         logo.setLayoutX(0);
         logo.setLayoutY(0);
 
-        Button start  = new Button("SOLO game ! ");
+        //set up the single player mode
+        Button start  = new Button("SOLO game");
         start.setLayoutX(800);
         start.setLayoutY(450);
         start.setOnMousePressed(event ->{
@@ -105,6 +109,7 @@ public class Viewer extends Application {
             startRound();
         });
 
+        //set up the battle mode (with a computer opponent)
         Button startMul = new Button("Against Computer ! ");
         startMul.setLayoutX(800);
         startMul.setLayoutY(500);
@@ -113,6 +118,7 @@ public class Viewer extends Application {
             MultiplePlayers.mulStart();
         });
 
+        //set up the viewer mode (task 4)
         Button view = new Button("Placement Viewer");
         view.setLayoutX(800);
         view.setLayoutY(550);
@@ -129,10 +135,12 @@ public class Viewer extends Application {
 
     }
 
+    // start a new round
     private void startRound(){
         if(roundNum==8){
             finishGame();
         }else {
+            //create a new round animation
             ImageView imageView = new ImageView();
             Image theRound = new Image(Viewer.class.getResource(URI_BASE+"round"+roundNum+".png").toString());
             Timeline timeline = new Timeline(   new KeyFrame(
@@ -148,6 +156,7 @@ public class Viewer extends Application {
             timeline.play();
             round.getChildren().add(imageView);
 
+            //create a round reminder button
             Button roundReminder = new Button("Round: "+roundNum);
             roundReminder.setLayoutX(650);
             roundReminder.setLayoutY(20);
@@ -165,17 +174,22 @@ public class Viewer extends Application {
         }
     }
 
+    //set up the board and the "back" button
     private void displayBoard() {
+        //set up a 7*7 board
         for(int i=0; i<7; i++){
             for(int m=0; m<7; m++){
                 board.getChildren().add(new Grid(150+i*65,100+m*65,65));
             }
         }
+
         board.getChildren().add(roundButton);
+
+        //set up a back button to back to the begin page
         Button back = new Button("Back");
         back.setLayoutX(20);
         back.setLayoutY(20);
-        back.setOnMousePressed(e -> {    //back 仍然有很多问题！！！！！！
+        back.setOnMousePressed(e -> {  //reset all
             controls.getChildren().clear();
             placementGroup.getChildren().clear();
             board.getChildren().clear();
@@ -188,22 +202,25 @@ public class Viewer extends Application {
             boardString = "";
             availableSpecial.clear();
             remainingSpecial=6;
+            roundNum=1;
+            countDice=0;
             moveTileRecord.clear();
             tiles.getChildren().clear();
             specialTiles.getChildren().clear();
             specialMoved=null;
             tileMoved=null;
-
             displayBeginPage();
         });
         board.getChildren().add(back);
-        initGrids();
+        initExits();
     }
 
-
+    // to finish the game and show the final result
     private void finishGame(){
         special.getChildren().clear();
         int basicScore = RailroadInk.getBasicScore(boardString);
+
+        //set up an alert to remind player the game is finished
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("You have finished the game!!");
         alert.setHeaderText("Your basic score is:  "+basicScore);
@@ -211,6 +228,8 @@ public class Viewer extends Application {
         Button score = new Button("Your basic score is :    "+basicScore);
         score.setLayoutX(750);
         score.setLayoutY(500);
+
+        //when alert is gone, help to view the final basic score
         Text t = new Text();
         t.setText("GOOD JOB! ");
         t.setX(750);
@@ -220,7 +239,8 @@ public class Viewer extends Application {
         special.getChildren().add(t);
     }
 
-    private ArrayList<ImageView> specialPics(){   //return all special tiles pictures
+    //return all special tiles pictures
+    private ArrayList<ImageView> specialPics(){
         ArrayList<ImageView> toReturn = new ArrayList<>();
         DraggableTile[] a = {tileS0, tileS1, tileS2, tileS3, tileS4, tileS5};
         for(DraggableTile tile:a){
@@ -245,7 +265,8 @@ public class Viewer extends Application {
         return toReturn;
     }
 
-    private ArrayList<ImageView> specialImages(DraggableTile tileClicked){ //return all special pictures expect the one clicked
+    //return all special pictures expect the one clicked
+    private ArrayList<ImageView> specialImages(DraggableTile tileClicked){
         ArrayList<ImageView> toReturn = new ArrayList<>();
         for(DraggableTile tile:availableSpecial){
             if(!tile.tileName.equals(tileClicked.tileName)){
@@ -270,66 +291,63 @@ public class Viewer extends Application {
         }
         return toReturn;
     }
+
+    //create a frame for the dices
+    //not the simplest way to create a frame, a better choice showed in class MultiplePlayers
     void initRollingArea(){
         Rectangle rectangle1 = new Rectangle();
         rectangle1.setHeight(10);
         rectangle1.setWidth(75*4+10);
         rectangle1.setX(700-10);
         rectangle1.setY(400-10);
-
         Rectangle rectangle2 = new Rectangle();
         rectangle2.setHeight(10);
         rectangle2.setWidth(75*4+10);
         rectangle2.setX(700-10);
         rectangle2.setY(400+65);
-
         Rectangle rectangle3 = new Rectangle();
         rectangle3.setHeight(65+20);
         rectangle3.setWidth(10);
         rectangle3.setX(700-10);
         rectangle3.setY(400-10);
-
         Rectangle rectangle4 = new Rectangle();
         rectangle4.setHeight(65+20);
         rectangle4.setWidth(10);
         rectangle4.setX(700+65);
         rectangle4.setY(400-10);
-
         Rectangle rectangle5 = new Rectangle();
         rectangle5.setHeight(65+20);
         rectangle5.setWidth(10);
         rectangle5.setX(700+75*2-10);
         rectangle5.setY(400-10);
-
         Rectangle rectangle6 = new Rectangle();
         rectangle6.setHeight(65+20);
         rectangle6.setWidth(10);
         rectangle6.setX(700+75*3-10);
         rectangle6.setY(400-10);
-
         Rectangle rectangle7 = new Rectangle();
         rectangle7.setHeight(65+20);
         rectangle7.setWidth(10);
         rectangle7.setX(700+75*4-10);
         rectangle7.setY(400-10);
-
         special.getChildren().addAll(rectangle1,rectangle2,rectangle3,rectangle4,rectangle5,rectangle6,rectangle7);
     }
 
+
+    //display special tiles' images, set up important buttons in each time dice rolling
     void displayRollingArea(){
 
+        //display special tiles
         for(ImageView specialPic:specialPics()){
             specialPictures.getChildren().add(specialPic);
         }
         special.getChildren().add(specialPictures);
 
+        //add a button to roll the dice
         Button roll = new Button("Roll");
         roll.setLayoutX(750);
         roll.setLayoutY(500);
-        Button stop = new Button("Stop");
-        stop.setLayoutX(750+75*2);
-        stop.setLayoutY(500);
-        roll.setOnMousePressed(event -> {
+        roll.setOnMousePressed(event -> {  //when press "roll", show the dice rolling gif
             ImageView theDice = new ImageView(Viewer.class.getResource(URI_BASE+"dieA.gif").toString());
             theDice.setFitWidth(65);
             theDice.setFitHeight(65);
@@ -337,23 +355,33 @@ public class Viewer extends Application {
             theDice.setLayoutY(400);
             dice.getChildren().add(theDice);
         });
+
+        //add a button to stop rolling dice, and get a normal draggable tile
+        Button stop = new Button("Stop");
+        stop.setLayoutX(750+75*2);
+        stop.setLayoutY(500);
         stop.setOnMousePressed(event -> {
             dice.getChildren().clear();
             String diceResult = RailroadInk.generateDiceRoll();
+            //tileMoved record the tile get and need to be placed
             tileMoved = new DraggableTile(diceResult.substring(countDice*2,countDice*2+2),700+countDice*75,400,this);
             tile.getChildren().add(tileMoved);
             countDice++;
 
+            //add a button for player to exchange given normal tile for a special tile
+            // properties of available special tiles are assigned in inner class DraggableTile
             Button useSpecial = new Button("Change to use special tiles");
             useSpecial.setLayoutX(700+150);
             useSpecial.setLayoutY(560);
             useSpecial.setOnMousePressed(e -> {
-                tile.getChildren().remove(tileMoved);
+                tile.getChildren().remove(tileMoved);  //clear the given normal tile
                 special.getChildren().remove(specialPictures);
                 tiles.getChildren().add(specialTiles);
                 board.getChildren().remove(useSpecial);
             });
 
+            //add a button for player to check the whether the placement is valid
+            //if not valid, give an alert; if valid, make the placement on board
             Button makePlacement = new Button("Make Placement ! ");
             makePlacement.setLayoutX(700);
             makePlacement.setLayoutY(560);
@@ -370,7 +398,7 @@ public class Viewer extends Application {
                         board.getChildren().remove(makePlacement);
                         boardString=boardString+placementString;
                         specialMoved=null;
-                        if(countDice==4){
+                        if(countDice==4){  //when roll the dice four times, enter the next round
                             roundNum++;
                             startRound();
                         }
@@ -394,7 +422,7 @@ public class Viewer extends Application {
                         boardString=boardString+placementString;
                         specialMoved=null;
                         remainingSpecial--;
-                        if(remainingSpecial<=3){
+                        if(remainingSpecial<=3){  //when used up three special tiles, player cannot use more special tiles
                             specialTiles.getChildren().clear();
                             specialPictures.getChildren().clear();
                             availableSpecial.clear();
@@ -429,7 +457,7 @@ public class Viewer extends Application {
         special.getChildren().addAll(roll,stop);
     }
 
-
+    //set up special tiles
     void initSpecials(){
         availableSpecial.add(tileS0);
         availableSpecial.add(tileS1);
@@ -446,7 +474,8 @@ public class Viewer extends Application {
         specialTiles.getChildren().add(tileS5);
     }
 
-    void initGrids(){
+    //set up exits
+    void initExits(){
         ImageView exitB0 = new ImageView();
         exitB0.setImage(new Image(Viewer.class.getResource(URI_BASE+"RailExit.png").toString()));
         exitB0.setFitHeight(65);
@@ -553,7 +582,7 @@ public class Viewer extends Application {
         board.getChildren().add(exitG5);
     }
 
-
+    //can create a image for one tile, given the tile name and its location
     class Tile extends ImageView {
         double x,y;
         String tileName;
@@ -572,6 +601,7 @@ public class Viewer extends Application {
         }
     }
 
+    //can create a draggable tile, add more functions based on Tile
     class DraggableTile extends Tile {
         private double x,y;
         private double mouseX, mouseY;
@@ -601,7 +631,7 @@ public class Viewer extends Application {
                 this.setLayoutX(this.x+ event.getSceneX() - mouseX);
                 this.setLayoutY(this.y+  event.getSceneY() - mouseY);
             });
-            this.setOnMouseReleased(event -> {
+            this.setOnMouseReleased(event -> {  //fit the tile into the nearest grid, if not on board, back to original place
                 double xFitted = nearestGrid(this.getLayoutX(),this.getLayoutY())[0];
                 double yFitted = nearestGrid(this.getLayoutX(),this.getLayoutY())[1];
                 this.setLayoutX(xFitted);
@@ -635,6 +665,9 @@ public class Viewer extends Application {
                 lockOthers();
             });
         }
+
+        //this function only for special tiles
+        //when clicked one tile, make other special tiles non-clickable
         void lockOthers(){
             if(this.tileName.substring(0,1).equals("S")){
                 if(specialMoved==null){
@@ -650,6 +683,7 @@ public class Viewer extends Application {
 
             }
         }
+
 
         String getPlacementString(){
             return tileName+gridName+rotate/90;
@@ -670,6 +704,7 @@ public class Viewer extends Application {
             }
         }
 
+        //show a red frame around the tile, disappear when click again
         void alertError(){
             Rectangle up = new Rectangle();
             Rectangle down = new Rectangle();
@@ -699,7 +734,9 @@ public class Viewer extends Application {
             alert.getChildren().addAll(up,down,left,right);
         }
 
-        void backToOrigin(){  //can only use on special tiles
+        //can only use on special tiles
+        //make the tile back to its original place
+        void backToOrigin(){
             int i = Integer.parseInt(this.tileName.substring(1,2));
             if(i<3){
                 this.setLayoutX(700+i*75);
@@ -715,6 +752,7 @@ public class Viewer extends Application {
 
     }
 
+    //get the location of the nearest grid
     double[] nearestGrid(double x, double y){
         double[] nearest = new double[2];
         double min = 65*65*2;
@@ -734,6 +772,7 @@ public class Viewer extends Application {
         return nearest;
     }
 
+    //a list record all grids' location
     int[][] gridLocation(){
         int[][] list = new int[49][2];
         int count = 0;
@@ -747,6 +786,7 @@ public class Viewer extends Application {
         return list;
     }
 
+    //a map record all grids' name and corresponding location
     HashMap<String,int[]> theBoardGrid(){
         HashMap<String,int[]> locations = new HashMap<>();
         int[][] locationValue = gridLocation();
@@ -757,6 +797,7 @@ public class Viewer extends Application {
         return locations;
     }
 
+    //help to build the board
     class Grid extends Rectangle {
         double x,y;
         double size;
@@ -774,6 +815,7 @@ public class Viewer extends Application {
     }
 
     /**
+     * this method is for viewer mode
      * Create a basic text field for input and a refresh button.
      */
     private void inputArea() {

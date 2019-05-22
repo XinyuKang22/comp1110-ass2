@@ -47,7 +47,10 @@ public class MultiplePlayers extends Viewer{
     private static Tile tileS4;
     private static Tile tileS5;
     private static Group alert = new Group();
-
+    public static Group round = new Group();
+    private static int specialRemaining = 6;
+    private static String diceResult = "";
+    private static String compSqu = "";
 
     public static void mulStart(){
         askPlayerName();
@@ -55,7 +58,52 @@ public class MultiplePlayers extends Viewer{
         nameAndScore();
         initSpecial();
         initDiceAndButtons();
+        rootMul.getChildren().add(round);
         root.getChildren().add(rootMul);
+
+        nextRound();
+    }
+
+    public static void nextRound(){
+        if(countRound==7){
+            finishGame();
+        }else {
+            countRound++;
+            diceResult = RailroadInk.generateDiceRoll();
+            compSqu = RailroadInk.generateMove(boardStringComp,diceResult);
+            ImageView imageView = new ImageView();
+            Image theRound = new Image(Viewer.class.getResource(URI_BASE+"round"+countRound+".png").toString());
+            Timeline timeline = new Timeline(   new KeyFrame(
+                    Duration.ZERO,
+                    e -> {imageView.setImage(theRound);
+                        imageView.setFitHeight(300);
+                        imageView.setFitWidth(700);
+                        imageView.setLayoutX(150);
+                        imageView.setLayoutY(110);}
+            ),
+                    new KeyFrame(Duration.millis(1000)));
+            timeline.setOnFinished(e -> round.getChildren().clear());
+            timeline.play();
+            round.getChildren().add(imageView);
+
+            Button roundReminder = new Button("Round: "+countRound);
+            roundReminder.setLayoutX(475);
+            roundReminder.setLayoutY(100);
+            board.getChildren().add(roundReminder);
+
+            /*
+            Text score1 = new Text();
+            Text score2 = new Text();
+            score1.setText("Basic Score: "+basicScorePlayer);
+            score2.setText("Basic Score: "+basicScoreComp);
+            score1.setLayoutX(320);
+            score1.setLayoutY(45);
+            score2.setLayoutX(870);
+            score2.setLayoutY(45);
+            board.getChildren().addAll(score1,score2);
+             */
+        }
+
     }
 
     private static void initDiceAndButtons(){
@@ -75,56 +123,16 @@ public class MultiplePlayers extends Viewer{
             timeline.play();
             timeline.setOnFinished(actionEvent -> {
                 board.getChildren().remove(imageView);
-                String diceResult = RailroadInk.generateDiceRoll();
                 String tileName = diceResult.substring(countDice*2,countDice*2+2);
                 tileGet = new DraggableTile(tileName,495,155);
                 board.getChildren().add(tileGet);
-                String compPlaceSqu = RailroadInk.generateMove(boardStringComp,diceResult);
-                String compPlacement = compPlaceSqu.substring(countDice*5,countDice*5+5);
+                String compPlacement = compSqu.substring(countDice*5,countDice*5+5); //为啥长度不够。。。
+                //假设comp没有special tile
+                Tile compTile = new Tile(compPlacement.substring(0,2),Integer.parseInt(compPlacement.substring(3,4))*50+620,(compPlacement.substring(2,3).hashCode()-65)*50+100,Integer.parseInt(compPlacement.substring(4,5))*90);
+                board.getChildren().add(compTile);
 
-                Button make = new Button("make placement");
-                make.setLayoutX(490);
-                make.setLayoutY(280);
-                make.setOnMousePressed(event -> {
-                    String placement="";
-                    if(specialUsing==null){
-                        placement = tileGet.getPlacementString();
-                        if(RailroadInk.isValidPlacementSequence(boardStringPlayer+placement) && !Board.isOverlap(placement,boardStringPlayer)){
-                            boardStringPlayer=boardStringPlayer+placement;
-                            board.getChildren().add(new Tile(tileGet.tileName,tileGet.getLayoutX(),tileGet.getLayoutY(),tileGet.rotate));
-                            board.getChildren().remove(tileGet);
-                            tileGet=null;
-                            if(countDice<3){
-                                countDice++;
-                            }else {
-                                countDice=0;
-                                countRound++;
-                            }
-                            //开始下一局！！！
-                        }else {
-                            tileGet.alertError();
-                        }
-                    }else {
-                        placement = specialUsing.getPlacementString();
-                        if(RailroadInk.isValidPlacementSequence(boardStringPlayer+placement) && !Board.isOverlap(placement,boardStringPlayer)){
-                            boardStringPlayer=boardStringPlayer+placement;
-                            board.getChildren().add(new Tile(specialUsing.tileName,specialUsing.getLayoutX(),specialUsing.getLayoutY(),specialUsing.rotate));
-                            board.getChildren().remove(specialUsing);
-                            specialUsing=null;
-                            if(countDice<3){
-                                countDice++;
-                            }else {
-                                countDice=0;
-                                countRound++;
-                            }
-                            //开始下一局！！！
-                        }else {
-                            specialUsing.alertError();
-                        }
-                    }
-                });
                 Button useSpecial = new Button("Use special tile");
-                useSpecial.setLayoutX(490);
+                useSpecial.setLayoutX(475);
                 useSpecial.setLayoutY(330);
                 useSpecial.setOnMousePressed(event -> {
                     board.getChildren().remove(useSpecial);
@@ -133,11 +141,111 @@ public class MultiplePlayers extends Viewer{
                     specials.getChildren().remove(specialImages);
                     specials.getChildren().add(specialTiles);
                 });
-                board.getChildren().addAll(make,useSpecial);
+
+                Button make = new Button("make placement");
+                make.setLayoutX(475);
+                make.setLayoutY(280);
+                make.setOnMousePressed(event -> {
+                    String placement="";
+                    if(specialUsing==null){
+                        placement = tileGet.getPlacementString();
+                        if(RailroadInk.isValidPlacementSequence(boardStringPlayer+placement) && !Board.isOverlap(placement,boardStringPlayer)){
+                            boardStringPlayer=boardStringPlayer+placement;
+                            System.out.println(boardStringPlayer);
+                            board.getChildren().add(new Tile(tileGet.tileName,tileGet.getLayoutX(),tileGet.getLayoutY(),tileGet.rotate));
+                            board.getChildren().remove(tileGet);
+                            tileGet=null;
+                            board.getChildren().remove(make);
+                            board.getChildren().remove(useSpecial);
+                            if(countRound<7){
+                                board.getChildren().add(roll);
+                            }else if (countRound==7 && countDice<3){
+                                board.getChildren().add(roll);
+                            }
+                            if(countDice<3){
+                                countDice++;
+                            }else {
+                                countDice=0;
+                                nextRound();
+                            }
+                            //basicScorePlayer=RailroadInk.getBasicScore(boardStringPlayer);
+                        }else {
+                            tileGet.alertError();
+                        }
+                    }else {
+                        placement = specialUsing.getPlacementString();
+                        if(RailroadInk.isValidPlacementSequence(boardStringPlayer+placement) && !Board.isOverlap(placement,boardStringPlayer)){
+                            boardStringPlayer=boardStringPlayer+placement;
+                            System.out.println(boardStringPlayer);
+                            board.getChildren().add(new Tile(specialUsing.tileName,specialUsing.getLayoutX(),specialUsing.getLayoutY(),specialUsing.rotate));
+                            board.getChildren().remove(specialUsing);
+                            specialUsing=null;
+                            board.getChildren().remove(make);
+                            board.getChildren().remove(useSpecial);
+                            specialRemaining--;
+                            if(countRound<7){
+                                board.getChildren().add(roll);
+                            }else if (countRound==7 && countDice<3){
+                                board.getChildren().add(roll);
+                            }
+                            if(countDice<3){
+                                countDice++;
+                            }else {
+                                countDice=0;
+                                nextRound();
+                            }
+                            //basicScorePlayer=RailroadInk.getBasicScore(boardStringPlayer);
+                        }else {
+                            specialUsing.alertError();
+                        }
+                    }
+                });
+                board.getChildren().add(make);
+                if(specialRemaining>3){
+                    board.getChildren().add(useSpecial);
+                }
             });
 
         });
         board.getChildren().add(roll);
+    }
+
+    private static void finishGame(){
+        int playerScore = RailroadInk.getBasicScore(boardStringPlayer);
+        int compScore = RailroadInk.getBasicScore(boardStringComp);
+        Image image;
+        if(playerScore>compScore){
+            image = new Image(Viewer.class.getResource(URI_BASE+"win.png").toString());
+        }else if(playerScore==compScore){
+            image = new Image(Viewer.class.getResource(URI_BASE+"even.png").toString());
+        }else {
+            image = new Image(Viewer.class.getResource(URI_BASE+"lose.png").toString());
+        }
+        ImageView imageView = new ImageView();
+        Timeline timeline = new Timeline(   new KeyFrame(
+                Duration.ZERO,
+                e -> {imageView.setImage(image);
+                    imageView.setFitHeight(300);
+                    imageView.setFitWidth(700);
+                    imageView.setLayoutX(150);
+                    imageView.setLayoutY(110);}
+        ),
+                new KeyFrame(Duration.millis(2000)));
+        timeline.setOnFinished(e -> board.getChildren().remove(imageView));
+        timeline.play();
+        board.getChildren().add(imageView);
+
+        Text a = new Text();
+        a.setText(yourName+" : "+playerScore);
+        a.setLayoutX(490);
+        a.setLayoutY(450);
+        Text b = new Text();
+        b.setText("Computer : "+compScore);
+        b.setLayoutX(490);
+        b.setLayoutY(490);
+        board.getChildren().addAll(a,b);
+
+
     }
 
     private static void initBoard(){   //棋盘和 back按钮  还有出口
@@ -199,7 +307,14 @@ public class MultiplePlayers extends Viewer{
             specials.getChildren().clear();
             specialImages.getChildren().clear();
             specialImagesComp.getChildren().clear();
+            round.getChildren().clear();
             yourName="";
+            boardStringPlayer="";
+            boardStringComp="";
+            countRound=0;
+            countDice=0;
+            basicScoreComp=0;
+            basicScorePlayer=0;
 
             root.getChildren().remove(rootMul);
             root.getChildren().add(begin);
@@ -222,21 +337,13 @@ public class MultiplePlayers extends Viewer{
     private static void nameAndScore(){
         Text name1 = new Text();
         Text name2 = new Text();
-        Text score1 = new Text();
-        Text score2 = new Text();
         name1.setText(yourName);
         name2.setText("Computer");
-        score1.setText("Basic Score: "+basicScorePlayer);
-        score2.setText("Basic Score: "+basicScoreComp);
         name1.setLayoutX(70);
         name1.setLayoutY(45);
-        score1.setLayoutX(320);
-        score1.setLayoutY(45);
         name2.setLayoutX(620);
         name2.setLayoutY(45);
-        score2.setLayoutX(870);
-        score2.setLayoutY(45);
-        grids.getChildren().addAll(name1,name2,score1,score2);
+        grids.getChildren().addAll(name1,name2);
     }
 
     public static void initSpecial(){
