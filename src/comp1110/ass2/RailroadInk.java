@@ -245,10 +245,10 @@ public class RailroadInk {
     public static String generateDiceRoll() {
         int result, result1, result2, result3 = 0;
         Random r = new Random();
-        result = r.nextInt(5);
-        result1 = r.nextInt(5);
-        result2 = r.nextInt(5);
-        result3 = r.nextInt(2);
+        result = r.nextInt(6);
+        result1 = r.nextInt(6);
+        result2 = r.nextInt(6);
+        result3 = r.nextInt(3);
         String dice = "A" + Integer.toString(result) + "A" +  Integer.toString(result1) + "A" +  Integer.toString(result2) +"B" + Integer.toString(result3);
         return dice;
     }
