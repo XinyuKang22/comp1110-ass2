@@ -164,23 +164,49 @@ public class RailroadInk {
             count++;
         }
 
-        if(!Board.isConnectedToExit(tilesPlacementList[0])){ //check whether 1st tile connected to exit
-            return false;
-        }
-
         for(int index = 1; index<tilesPlacementList.length; index++) {
+            if(!Board.isConnectedToExit(tilesPlacementList[0])){ //check whether 1st tile connected to exit
+                return false;
+            }
+            String[] previousPlacements = new String[index];
+            System.arraycopy(tilesPlacementList, 0, previousPlacements, 0, index);
 
-            if(Board.isAtExit(tilesPlacementList[index])){
-                if(!Board.isConnectedToExit(tilesPlacementList[index]) || Board.isOverlap(tilesPlacementList[index],boardString.substring(0,index*5))){
-                    return false;
-                }
-            }else {
-                String[] previousPlacements = new String[index];
-                System.arraycopy(tilesPlacementList, 0, previousPlacements, 0, index);
-                if (!Board.hasConnectedNeighbors(tilesPlacementList[index], previousPlacements) ||Board.isOverlap(tilesPlacementList[index],boardString.substring(0,index*5)) ) {
-                    return false;
+            if(Board.isOverlap(tilesPlacementList[index],boardString.substring(0,index*5))){
+                return false;
+            }else{
+                if(Board.isAtExit(tilesPlacementList[index])){
+                    if(!Board.hasConnectedNeighbors(tilesPlacementList[index],previousPlacements)){
+                        if(!Board.isConnectedToExit(tilesPlacementList[index])){
+                            return false;
+                        }
+                    }else {
+                        if(!Board.isConnectedToExit(tilesPlacementList[index])){
+                            int col = Integer.parseInt(tilesPlacementList[index].substring(3,4));
+                            char row = tilesPlacementList[index].charAt(2);
+                            String[] a = Board.rotatedTileInfo(tilesPlacementList[index]);
+                            String theEdge = "";
+                            if(col==0){
+                                theEdge=a[3];
+                            }else if(col==6){
+                                theEdge=a[1];
+                            }
+                            if(row=='A'){
+                                theEdge=a[0];
+                            }else if(row=='G'){
+                                theEdge=a[1];
+                            }
+                            if(theEdge!="Nothing"){
+                                return false;
+                            }
+                        }
+                    }
+                }else {
+                    if(!Board.hasConnectedNeighbors(tilesPlacementList[index],previousPlacements)){
+                        return false;
+                    }
                 }
             }
+
             HashMap<String,Integer> allNeighbors = new HashMap<>();
             for(String s:tilesPlacementList){
                 if(s.equals(tilesPlacementList[index])){
