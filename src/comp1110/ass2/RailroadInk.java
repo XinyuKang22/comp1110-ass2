@@ -2,9 +2,7 @@ package comp1110.ass2;
 
 import comp1110.ass2.gui.Board;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Random;
+import java.util.*;
 
 public class RailroadInk {
 
@@ -164,10 +162,11 @@ public class RailroadInk {
             count++;
         }
 
+        if(!Board.isConnectedToExit(tilesPlacementList[0])){ //check whether 1st tile connected to exit
+            return false;
+        }
+
         for(int index = 1; index<tilesPlacementList.length; index++) {
-            if(!Board.isConnectedToExit(tilesPlacementList[0])){ //check whether 1st tile connected to exit
-                return false;
-            }
             String[] previousPlacements = new String[index];
             System.arraycopy(tilesPlacementList, 0, previousPlacements, 0, index);
 
@@ -303,6 +302,79 @@ public class RailroadInk {
      * @see RailroadInk#generateDiceRoll()
      */
     public static String generateMove(String boardString, String diceRoll) {
+        String tile1 = diceRoll.substring(0,2);
+        String tile2 = diceRoll.substring(2,4);
+        String tile3 = diceRoll.substring(4,6);
+        String tile4 = diceRoll.substring(6,8);
+
+        ArrayList<String[]> list = new ArrayList<>();
+        String[] a1 = {tile1,tile2,tile3,tile4};
+        String[] a2 = {tile1,tile2,tile4,tile3};
+        String[] a3 = {tile1,tile3,tile2,tile4};
+        String[] a4 = {tile1,tile3,tile4,tile2};
+        String[] a5 = {tile1,tile4,tile2,tile3};
+        String[] a6 = {tile1,tile4,tile3,tile2};
+        String[] b1 = {tile2,tile1,tile3,tile4};
+        String[] b2 = {tile2,tile1,tile4,tile3};
+        String[] b3 = {tile2,tile3,tile1,tile4};
+        String[] b4 = {tile2,tile3,tile4,tile1};
+        String[] b5 = {tile2,tile4,tile1,tile3};
+        String[] b6 = {tile2,tile4,tile3,tile1};
+        String[] c1 = {tile3,tile1,tile2,tile4};
+        String[] c2 = {tile3,tile1,tile4,tile2};
+        String[] c3 = {tile3,tile2,tile1,tile4};
+        String[] c4 = {tile3,tile2,tile4,tile1};
+        String[] c5 = {tile3,tile4,tile1,tile2};
+        String[] c6 = {tile3,tile4,tile2,tile1};
+        String[] d1 = {tile4,tile1,tile2,tile3};
+        String[] d2 = {tile4,tile1,tile3,tile2};
+        String[] d3 = {tile4,tile2,tile1,tile3};
+        String[] d4 = {tile4,tile2,tile3,tile1};
+        String[] d5 = {tile4,tile3,tile1,tile2};
+        String[] d6 = {tile4,tile3,tile2,tile1};
+        list.add(a1);
+        list.add(a2);
+        list.add(a3);
+        list.add(a4);
+        list.add(a5);
+        list.add(a6);
+        list.add(b1);
+        list.add(b2);
+        list.add(b3);
+        list.add(b4);
+        list.add(b5);
+        list.add(b6);
+        list.add(c1);
+        list.add(c2);
+        list.add(c3);
+        list.add(c4);
+        list.add(c5);
+        list.add(c6);
+        list.add(d1);
+        list.add(d2);
+        list.add(d3);
+        list.add(d4);
+        list.add(d5);
+        list.add(d6);
+
+        ArrayList<String> results = new ArrayList<>();
+        int maxLen = boardString.length();
+        String bestOne = "";
+        for(String[] s: list){
+            String k = onePos(boardString,s);
+            results.add(k);
+            if((k.length()-boardString.length())==20){
+                return k.substring(boardString.length());
+            }
+            if(k.length()>maxLen){
+                maxLen=k.length();
+                bestOne=k;
+            }
+
+        }
+        return bestOne.substring(boardString.length());
+
+        /*
         String moves1 = generateMoves(boardString,diceRoll);
         String moves2 = generateMoves(boardString,diceRoll.substring(6) + diceRoll.substring(0,6));
         String moves3 = generateMoves(boardString,diceRoll.substring(4) + diceRoll.substring(0,4));
@@ -311,18 +383,91 @@ public class RailroadInk {
         else if (moves2.length() > moves1.length() && moves2.length() >= moves3.length() && moves2.length() >= moves4.length()){return moves2;}
         else if (moves3.length() > moves1.length() && moves3.length() >= moves2.length() && moves3.length() >= moves4.length()){return moves3;}
         else if (moves4.length() > moves1.length() && moves4.length() >= moves2.length()){return moves4;}
+        return moves1;
+         */
+    }
 
-        return moves1;}
+    public static String onePos (String boardString, String[] dices){
+        String moves1 = oneMove(boardString,dices[0]);
+        if(moves1.length()==boardString.length()){
+            return boardString;
+        }
+        String moves2 = oneMove(moves1,dices[1]);
+        if(moves2.length()==moves1.length()){
+            return moves1;
+        }
+        String moves3 = oneMove(moves2,dices[2]);
+        if (moves3.length()==moves2.length()){
+            return moves2;
+        }
+        String moves4 = oneMove(moves3,dices[3]);
+        return moves4;
+    }
+
+    public static String oneMove(String boardString, String tileName){
+        String[] a = {"A","B","C","D","E","F","G"};
+        String[] b = {"1","2","3","4","5","6","7"};
+        String[] c = {"0","1","2","3","4","5","6","7"};
+        //ArrayList<String> list = new ArrayList<>();
+        String toReturn="";
+        for(String row:a){
+            if(toReturn.length()>=5){
+                break;
+            }
+            for(String col:b){
+                if(toReturn.length()>=5){
+                    break;
+                }
+                for(String ori:c){
+                    String place = tileName+row+col+ori;
+                    if(isBoardStringWellFormed(boardString+place) && isValidPlacementSequence(boardString+place)){
+                        //list.add(place);
+                        toReturn=place;
+                        break;
+                    }
+                }
+            }
+        }
+
+        String[] d = {"0","1","2","3","4","5"};
+        if(toReturn.isEmpty()){
+            for(String special:d){
+                if(toReturn.length()>=5){
+                    break;
+                }
+                for(String col:a){
+                    if(toReturn.length()>=5){
+                        break;
+                    }
+                    for(String row:b){
+                        if(toReturn.length()>=5){
+                            break;
+                        }
+                        for(String ori:c){
+                            String place = "S"+special+row+col+ori;
+                            if(isBoardStringWellFormed(boardString+place) && isValidPlacementSequence(boardString+place)){
+                                toReturn=place;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return boardString+toReturn;
+    }
+
+/*
 
 
-
-    private static String generateMoves(String boardString, String diceRoll) {
+    public static String generateMoves(String boardString, String diceRoll) {
         String moves = "";
         for (int i = 0; i <diceRoll.length(); i += 2){
             String move = generateAMove(boardString,diceRoll.substring(i,i+2));
             if(move != ""){
                 moves += move;
                 boardString += move; }}
+        System.out.println(moves);
         return moves;
     }
 
@@ -342,6 +487,7 @@ public class RailroadInk {
 
         return "";
     }
+ */
 
     /**
      * Given the current state of a game board, output an integer representing the sum of all the factors contributing
