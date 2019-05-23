@@ -303,6 +303,12 @@ public class Board extends RailroadInk {
         return false;
     }
 
+    /**
+     * @author Xinyu Kang
+     * @param tilePlacementString
+     * @param boardString
+     * @return true if the tile placement is overlapped with previous placements
+     */
     public static boolean isOverlap(String tilePlacementString, String boardString){
 
         for(int i = 0; i<boardString.length(); i=i+5){

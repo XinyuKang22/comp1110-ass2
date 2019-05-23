@@ -264,7 +264,7 @@ public class RailroadInk {
      * Die B has faces numbered 0-2.
      * Each die roll is composed of a character 'A' or 'B' representing the dice,
      * followed by a digit character representing the face.
-     *
+     * @author Yinuo Zhang
      * @return a String representing the die roll e.g. A0A4A3B2
      */
     public static String generateDiceRoll() {
@@ -284,7 +284,7 @@ public class RailroadInk {
      * * Number of exits mapped
      * * Number of centre tiles used
      * * Number of dead ends in the network
-     *
+     * @author Yinuo Zhang
      * @param boardString a board string representing a completed game
      * @return integer (positive or negative) for score *not* considering longest rail/highway
      */
@@ -296,6 +296,7 @@ public class RailroadInk {
     /**
      * Given a valid boardString and a dice roll for the round,
      * return a String representing an ordered sequence of valid piece placements for the round.
+     * @author Xinyu Kang
      * @param boardString a board string representing the current state of the game as at the start of the round
      * @param diceRoll a String representing a dice roll for the round
      * @return a String representing an ordered sequence of valid piece placements for the current round
@@ -306,7 +307,6 @@ public class RailroadInk {
         String tile2 = diceRoll.substring(2,4);
         String tile3 = diceRoll.substring(4,6);
         String tile4 = diceRoll.substring(6,8);
-
         ArrayList<String[]> list = new ArrayList<>();
         String[] a1 = {tile1,tile2,tile3,tile4};
         String[] a2 = {tile1,tile2,tile4,tile3};
@@ -361,7 +361,7 @@ public class RailroadInk {
         int maxLen = boardString.length();
         String bestOne = "";
         for(String[] s: list){
-            String k = onePos(boardString,s);
+            String k = onePossibility(boardString,s);
             results.add(k);
             if((k.length()-boardString.length())==20){
                 return k.substring(boardString.length());
@@ -375,6 +375,7 @@ public class RailroadInk {
         return bestOne.substring(boardString.length());
 
         /*
+        // task 10 version 1 part one, @author Yinuo Zhang
         String moves1 = generateMoves(boardString,diceRoll);
         String moves2 = generateMoves(boardString,diceRoll.substring(6) + diceRoll.substring(0,6));
         String moves3 = generateMoves(boardString,diceRoll.substring(4) + diceRoll.substring(0,4));
@@ -387,7 +388,13 @@ public class RailroadInk {
          */
     }
 
-    public static String onePos (String boardString, String[] dices){
+    /**
+     * @author Xinyu Kang
+     * @param boardString
+     * @param dices a list of dice rolling results i.e. {"A0","A0","A2","B1"}
+     * @return new boardString
+     */
+    public static String onePossibility(String boardString, String[] dices){
         String moves1 = oneMove(boardString,dices[0]);
         if(moves1.length()==boardString.length()){
             return boardString;
@@ -404,11 +411,16 @@ public class RailroadInk {
         return moves4;
     }
 
+    /**
+     * @author Xinyu Kang
+     * @param boardString
+     * @param tileName
+     * @return a new boardString
+     */
     public static String oneMove(String boardString, String tileName){
         String[] a = {"A","B","C","D","E","F","G"};
         String[] b = {"1","2","3","4","5","6","7"};
         String[] c = {"0","1","2","3","4","5","6","7"};
-        //ArrayList<String> list = new ArrayList<>();
         String toReturn="";
         for(String row:a){
             if(toReturn.length()>=5){
@@ -459,7 +471,7 @@ public class RailroadInk {
 
 /*
 
-
+    //task 10 version 1  part two , @author Yinuo Zhang
     public static String generateMoves(String boardString, String diceRoll) {
         String moves = "";
         for (int i = 0; i <diceRoll.length(); i += 2){
@@ -489,6 +501,8 @@ public class RailroadInk {
     }
  */
 
+
+
     /**
      * Given the current state of a game board, output an integer representing the sum of all the factors contributing
      * to `getBasicScore`, as well as those attributed to:
@@ -503,14 +517,6 @@ public class RailroadInk {
         // FIXME Task 12: compute the total score including bonus points
         return -1;
     }
-
-    public static void main(String[] args) {
-        String a = "A0F00A0B00A0A30B1A10A0B61A0F61A0G32B1D61A0G43A0A62A0E61B1G56S1G60S5A20A0E03A0A03B1G12A0G02S0A50A0B50A0B41B1A41";
-        String b = "A0A0A0B1";
-        System.out.println(generateMove(a,b));
-        System.out.println();
-    }
-
 
 }
 
