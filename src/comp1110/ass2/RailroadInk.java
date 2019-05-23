@@ -303,17 +303,26 @@ public class RailroadInk {
      * @see RailroadInk#generateDiceRoll()
      */
     public static String generateMove(String boardString, String diceRoll) {
-        String moves = "";
+        String moves1 = generateMoves(boardString,diceRoll);
+        String moves2 = generateMoves(boardString,diceRoll.substring(6) + diceRoll.substring(0,6));
+        String moves3 = generateMoves(boardString,diceRoll.substring(4) + diceRoll.substring(0,4));
+        String moves4 = generateMoves(boardString,diceRoll.substring(2) + diceRoll.substring(0,2));
+        if (moves1.length() == 20){return moves1;} else if (moves2.length() == 20){return moves2;} else if (moves3.length() == 20){return moves3;} else if (moves4.length() == 20){return moves4;}
+        else if (moves2.length() > moves1.length() && moves2.length() >= moves3.length() && moves2.length() >= moves4.length()){return moves2;}
+        else if (moves3.length() > moves1.length() && moves3.length() >= moves2.length() && moves3.length() >= moves4.length()){return moves3;}
+        else if (moves4.length() > moves1.length() && moves4.length() >= moves2.length()){return moves4;}
 
+        return moves1;}
+
+
+
+    private static String generateMoves(String boardString, String diceRoll) {
+        String moves = "";
         for (int i = 0; i <diceRoll.length(); i += 2){
             String move = generateAMove(boardString,diceRoll.substring(i,i+2));
-            if (move != ""){
-            System.out.println(move);
-            moves += move;
-            boardString += move;
-            System.out.println(boardString);}
-        }
-
+            if(move != ""){
+                moves += move;
+                boardString += move; }}
         return moves;
     }
 
@@ -352,8 +361,8 @@ public class RailroadInk {
     public static void main(String[] args) {
         String a = "A0F00A0B00A0A30B1A10A0B61A0F61A0G32B1D61A0G43A0A62A0E61B1G56S1G60S5A20A0E03A0A03B1G12A0G02S0A50A0B50A0B41B1A41";
         String b = "A0A0A0B1";
-        System.out.println(b + null);
-        System.out.println(generateMove(a,b ));
+        System.out.println(generateMove(a,b));
+        System.out.println();
     }
 
 
