@@ -5,7 +5,6 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.scene.Group;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -23,8 +22,6 @@ import javafx.util.Duration;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
-
 import static javafx.scene.paint.Color.*;
 
 /**
@@ -68,18 +65,6 @@ public class Viewer extends Application {
     private DraggableTile specialMoved = null;
     private Group specialPictures = new Group();
     private Group tiles = new Group();
-    private DraggableTile firstNormal;
-    private DraggableTile secondNormal;
-    private DraggableTile thirdNormal;
-    private DraggableTile fourthNormal;
-    private Tile firstImage;
-    private Tile secondImage;
-    private Tile thirdImage;
-    private Tile fourthImage;
-    private Group normals = new Group();
-    private Group normalImages = new Group();
-    private DraggableTile tileUsing = null;
-    private Group usedTiles = null;
 
     @Override
     public void start(Stage primaryStage) throws Exception {   //start the game
@@ -363,33 +348,12 @@ public class Viewer extends Application {
         roll.setLayoutX(750);
         roll.setLayoutY(500);
         roll.setOnMousePressed(event -> {  //when press "roll", show the dice rolling gif
-            ImageView theDice1 = new ImageView(Viewer.class.getResource(URI_BASE+"dieA.gif").toString());
-            theDice1.setFitWidth(65);
-            theDice1.setFitHeight(65);
-            theDice1.setLayoutX(700);
-            theDice1.setLayoutY(400);
-            dice.getChildren().add(theDice1);
-
-            ImageView theDice2 = new ImageView(Viewer.class.getResource(URI_BASE+"dieA.gif").toString());
-            theDice2.setFitWidth(65);
-            theDice2.setFitHeight(65);
-            theDice2.setLayoutX(700+75);
-            theDice2.setLayoutY(400);
-            dice.getChildren().add(theDice2);
-
-            ImageView theDice3 = new ImageView(Viewer.class.getResource(URI_BASE+"dieA.gif").toString());
-            theDice3.setFitWidth(65);
-            theDice3.setFitHeight(65);
-            theDice3.setLayoutX(700+2*75);
-            theDice3.setLayoutY(400);
-            dice.getChildren().add(theDice3);
-
-            ImageView theDice4 = new ImageView(Viewer.class.getResource(URI_BASE+"dieA.gif").toString());
-            theDice4.setFitWidth(55);
-            theDice4.setFitHeight(55);
-            theDice4.setLayoutX(700+3*75+5);
-            theDice4.setLayoutY(400+5);
-            dice.getChildren().add(theDice4);
+            ImageView theDice = new ImageView(Viewer.class.getResource(URI_BASE+"dieA.gif").toString());
+            theDice.setFitWidth(65);
+            theDice.setFitHeight(65);
+            theDice.setLayoutX(700+countDice*75);
+            theDice.setLayoutY(400);
+            dice.getChildren().add(theDice);
         });
 
         //add a button to stop rolling dice, and get a normal draggable tile
@@ -399,22 +363,10 @@ public class Viewer extends Application {
         stop.setOnMousePressed(event -> {
             dice.getChildren().clear();
             String diceResult = RailroadInk.generateDiceRoll();
-            firstNormal = new DraggableTile(diceResult.substring(0,2),700,400,this);
-            secondNormal = new DraggableTile(diceResult.substring(2,4),700+75,400,this);
-            thirdNormal = new DraggableTile(diceResult.substring(4,6),700+75*2,400,this);
-            fourthNormal = new DraggableTile(diceResult.substring(6,8),700+75*3,400,this);
-            firstImage = new Tile(diceResult.substring(0,2),700,400);
-            secondImage = new Tile(diceResult.substring(2,4),700+75,400);
-            thirdImage = new Tile(diceResult.substring(4,6),700+75*2,400);
-            fourthImage = new Tile(diceResult.substring(6,8),700+75*3,400);
-            normals.getChildren().addAll(firstNormal,secondNormal,thirdNormal,fourthNormal);
-            normalImages.getChildren().addAll(firstImage,secondImage,thirdImage,fourthImage);
-            board.getChildren().add(normals);
-
             //tileMoved record the tile get and need to be placed
-            //tileMoved = new DraggableTile(diceResult.substring(countDice*2,countDice*2+2),700+countDice*75,400,this);
-            //tile.getChildren().add(tileMoved);
-            //countDice++;
+            tileMoved = new DraggableTile(diceResult.substring(countDice*2,countDice*2+2),700+countDice*75,400,this);
+            tile.getChildren().add(tileMoved);
+            countDice++;
 
             //add a button for player to exchange given normal tile for a special tile
             // properties of available special tiles are assigned in inner class DraggableTile
@@ -430,93 +382,68 @@ public class Viewer extends Application {
 
             //add a button for player to check the whether the placement is valid
             //if not valid, give an alert; if valid, make the placement on board
-            Button makePlacement = new Button("Make one Placement ! ");
+            Button makePlacement = new Button("Make Placement ! ");
             makePlacement.setLayoutX(700);
             makePlacement.setLayoutY(560);
             makePlacement.setOnMousePressed(e ->{
-                if(tileUsing==null && specialMoved==null){
-                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                    alert.setHeaderText("No placement made !");
-                    alert.showAndWait();
-                }else {
-                    String placementString;
-                    if(specialMoved==null){  //placed a normal tile
-                        placementString = tileUsing.getPlacementString();
-                        if(RailroadInk.isValidPlacementSequence(boardString+placementString) && RailroadInk.isBoardStringWellFormed(boardString+placementString)){
-                            makePlacement(placementString);
-                            //usedTiles.getChildren().add(tileUsing);
-                            tile.getChildren().remove(tileUsing);
-                            //special.getChildren().add(roll);
-                            //special.getChildren().add(stop);
-                            board.getChildren().remove(useSpecial);
-                            //board.getChildren().remove(makePlacement);
-                            boardString=boardString+placementString;
-                            specialMoved=null;
-                            if(countDice<3){
-                                board.getChildren().add(normals);
-                                countDice++;
-                            }else {
-                                countDice=0;
-                                usedTiles.getChildren().clear();
-                                board.getChildren().remove(makePlacement);
-                                if(roundNum<7){
-                                    board.getChildren().add(roll);
-                                }else if (roundNum==7 && countDice<3){
-                                    board.getChildren().add(roll);
-                                }
-                                startRound();
-                            }
-                        }else {
-                            tileMoved.alertError();
-                            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                            alert.headerTextProperty().set("Invalid Placement!!");
-                            alert.showAndWait();
+                String placementString;
+                if(specialMoved==null){  //placed a normal tile
+                    placementString = tileMoved.getPlacementString();
+                    if(RailroadInk.isValidPlacementSequence(boardString+placementString) &&!Board.isOverlap(placementString,boardString)){
+                        makePlacement(placementString);
+                        tile.getChildren().remove(tileMoved);
+                        special.getChildren().add(roll);
+                        special.getChildren().add(stop);
+                        board.getChildren().remove(useSpecial);
+                        board.getChildren().remove(makePlacement);
+                        boardString=boardString+placementString;
+                        specialMoved=null;
+                        if(countDice==4){  //when roll the dice four times, enter the next round
+                            roundNum++;
+                            startRound();
                         }
-                    }else {  //placed a special tile
-                        placementString = specialMoved.getPlacementString();
-                        if(RailroadInk.isValidPlacementSequence(boardString+placementString)&& RailroadInk.isBoardStringWellFormed(boardString+placementString)){
-                            makePlacement(placementString);
-                            boardString=boardString+placementString;
-                            availableSpecial.remove(specialMoved);
-                            specialTiles.getChildren().remove(specialMoved);
-                            special.getChildren().remove(specialMoved);
-                            //special.getChildren().add(roll);
-                            //special.getChildren().add(stop);
-                            board.getChildren().remove(useSpecial);
-                            //board.getChildren().remove(makePlacement);
-                            specialMoved=null;
-                            remainingSpecial--;
-                            if(countDice<3){
-                                countDice++;
-                            }else {
-                                if(roundNum<7){
-                                    board.getChildren().add(roll);
-                                }else if (roundNum==7 && countDice<3){
-                                    board.getChildren().add(roll);
-                                }
-                                countDice=0;
-                                board.getChildren().remove(makePlacement);
-                                startRound();
-                            }
-                            if(remainingSpecial<=3){  //when used up three special tiles, player cannot use more special tiles
-                                specialTiles.getChildren().clear();
-                                specialPictures.getChildren().clear();
-                                availableSpecial.clear();
-                            }
-                        }else {
-                            DraggableTile a = specialMoved;
-                            special.getChildren().remove(specialPictures);
-                            special.getChildren().remove(specialMoved);
-                            specialTiles.getChildren().add(a);
-                            a.backToOrigin();
-                            tiles.getChildren().add(specialTiles);
-                            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                            alert.headerTextProperty().set("Invalid Special Placement!!");
-                            alert.showAndWait();
-                            specialMoved=null;
-                        }
-
+                    }else {
+                        tileMoved.alertError();
+                        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                        alert.headerTextProperty().set("Invalid Placement!!");
+                        alert.showAndWait();
                     }
+                }else {  //placed a special tile
+                    placementString = specialMoved.getPlacementString();
+                    if(RailroadInk.isValidPlacementSequence(boardString+placementString)&&!Board.isOverlap(placementString,boardString)){
+                        makePlacement(placementString);
+                        availableSpecial.remove(specialMoved);
+                        specialTiles.getChildren().remove(specialMoved);
+                        special.getChildren().remove(specialMoved);
+                        special.getChildren().add(roll);
+                        special.getChildren().add(stop);
+                        board.getChildren().remove(useSpecial);
+                        board.getChildren().remove(makePlacement);
+                        boardString=boardString+placementString;
+                        specialMoved=null;
+                        remainingSpecial--;
+                        if(remainingSpecial<=3){  //when used up three special tiles, player cannot use more special tiles
+                            specialTiles.getChildren().clear();
+                            specialPictures.getChildren().clear();
+                            availableSpecial.clear();
+                        }
+                        if(countDice==4){
+                            roundNum++;
+                            startRound();
+                        }
+                    }else {
+                        DraggableTile a = specialMoved;
+                        special.getChildren().remove(specialPictures);
+                        special.getChildren().remove(specialMoved);
+                        specialTiles.getChildren().add(a);
+                        a.backToOrigin();
+                        tiles.getChildren().add(specialTiles);
+                        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                        alert.headerTextProperty().set("Invalid Special Placement!!");
+                        alert.showAndWait();
+                        specialMoved=null;
+                    }
+
                 }
             });
 
@@ -671,11 +598,6 @@ public class Viewer extends Application {
             this.setLayoutY(y);
             this.toFront();
 
-            this.setOnMousePressed(e -> {
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setHeaderText("This tile is locked!");
-                alert.showAndWait();
-            });
         }
     }
 
@@ -686,17 +608,6 @@ public class Viewer extends Application {
         private Viewer viewer;
         private int rotate=0;
         String gridName = "__";
-        private double oriX = -1;
-        private double oriY = -1;
-
-        void recordOriginalLocation(){
-            if(oriX<0){
-                oriX=this.x;
-            }
-            if(oriY<0){
-                oriY=this.y;
-            }
-        }
 
         DraggableTile(String tileName, double x, double y, Viewer viewer){
             super(tileName,x,y);
@@ -708,7 +619,6 @@ public class Viewer extends Application {
                 this.rotate();
             });
             this.setOnMousePressed(event -> {
-                this.recordOriginalLocation();
                 this.mouseX = event.getSceneX();
                 this.mouseY = event.getSceneY();
                 this.x = super.getLayoutX();
@@ -771,19 +681,6 @@ public class Viewer extends Application {
                     special.getChildren().add(specialPictures);
                 }
 
-            }else {
-                if(tileUsing==null){
-                    board.getChildren().remove(normals);
-                   tileUsing=this;
-                   board.getChildren().addAll(tileUsing);
-                    Iterator<Node> iterator = normalImages.getChildren().iterator();
-                    while (iterator.hasNext()){
-                        if (iterator.next().getLayoutX()==this.oriX){
-                            iterator.remove();
-                        }
-                    }
-                    board.getChildren().add(normalImages);
-                }
             }
         }
 
