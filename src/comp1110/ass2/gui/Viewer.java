@@ -19,18 +19,13 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import comp1110.ass2.RailroadInk;
 import javafx.util.Duration;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import static javafx.scene.paint.Color.*;
 
 /**
- * A very simple viewer for tile placements in the Railroad Ink game.
- * <p>
- * NOTE: This class is separate from your main game class.  This
- * class does not play a game, it just illustrates various tile placements.
+ * @author Xinyu Kang
  */
-//Written by Xinyu Kang
 public class Viewer extends Application {
 
     private static final int VIEWER_WIDTH = 1024;

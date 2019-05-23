@@ -17,4 +17,4 @@ We declare that the work we have submitted for Stage G of this assignment and al
         - "round1.png" to "round7.png", "win.png", "lose.png", and "even.png" are purely made using Microsoft word;
         
 
-Signed: Xinyu Kang (u6120911), 
+Signed: Xinyu Kang (u6120911), Yinuo Zhang (u6598700)

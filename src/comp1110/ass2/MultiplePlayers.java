@@ -14,36 +14,34 @@ import javafx.scene.image.ImageView;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Optional;
-
 import static javafx.scene.paint.Color.*;
 
 
-//Written by Xinyu Kang
+/**
+ * @author Xinyu Kang
+ */
 public class MultiplePlayers extends Viewer{
 
-    private static final int VIEWER_WIDTH = 1024;
-    private static final int VIEWER_HEIGHT = 640;
     private static final String URI_BASE = "assets/";
     private static Group rootMul = new Group();
-    private static Group board = new Group();  //包括 : 棋盘， 玩家头像， 玩家名称, 回合计数器， 基本分数按钮， 骰子框框, 骰子
-    private static String yourName="";  //玩家名字，等待输入
+    private static Group board = new Group();
+    private static String yourName="";
     private static String boardStringPlayer = "";
     private static String boardStringComp = "";
-    private static Group specials = new Group(); //draggable special tiles  player
-    private static Group specialImages = new Group();  //special tile images   player
-    private static Group specialImagesComp = new Group();  //special tile images   comp
+    private static Group specials = new Group(); //draggable special tiles for player
+    private static Group specialImages = new Group();  //special tile images for player
+    private static Group specialImagesComp = new Group();  //special tile images  for comp
     private static int countRound = 0;
     private static int countDice = 0;
-    private static Group grids = new Group();   //棋盘和返回键, 名字和基础分
+    private static Group grids = new Group();
     private static int basicScorePlayer = 0;
     private static int basicScoreComp = 0;
-    private static DraggableTile tileUsing = null;
-    private static DraggableTile specialUsing = null;
+    private static DraggableTile tileUsing = null;  //cache of normal tile using
+    private static DraggableTile specialUsing = null; //cache of special tile using
     private static Group specialTiles = new Group();
     private static Tile tileS0;
     private static Tile tileS1;
@@ -71,6 +69,7 @@ public class MultiplePlayers extends Viewer{
     private static Text currentScorePlayer = null;
     private static Text currentScoreComp = null;
 
+    //start the game
     public static void mulStart(){
         askPlayerName();
         initBoard();
@@ -83,15 +82,17 @@ public class MultiplePlayers extends Viewer{
         nextRound();
     }
 
+    //begin a new round
     public static void nextRound(){
         if(countRound==7){
             finishGame();
         }else {
             countRound++;
+            //initialize the dice and update the placements of computer
             diceResult = RailroadInk.generateDiceRoll();
-            //System.out.println("dice result in round "+countRound+" is: "+diceResult);
             compSqu = RailroadInk.generateMove(boardStringComp,diceResult);
-            //System.out.println("AI movement in round "+countRound+" is: "+compSqu);
+
+            //show the round animation
             ImageView imageView = new ImageView();
             Image theRound = new Image(Viewer.class.getResource(URI_BASE+"round"+countRound+".png").toString());
             Timeline timeline = new Timeline(   new KeyFrame(
@@ -107,60 +108,52 @@ public class MultiplePlayers extends Viewer{
             timeline.play();
             round.getChildren().add(imageView);
 
+            //show round reminder
             Button roundReminder = new Button("Round: "+countRound);
             roundReminder.setLayoutX(475);
             roundReminder.setLayoutY(100);
             board.getChildren().add(roundReminder);
             board.getChildren().add(normals);
-            /*
-            Text score1 = new Text();
-            Text score2 = new Text();
-            score1.setText("Basic Score: "+basicScorePlayer);
-            score2.setText("Basic Score: "+basicScoreComp);
-            score1.setLayoutX(320);
-            score1.setLayoutY(45);
-            score2.setLayoutX(870);
-            score2.setLayoutY(45);
-            board.getChildren().addAll(score1,score2);
-             */
         }
 
     }
 
+    //initialize dices and buttons need during a round
     private static void initDiceAndButtons(){
+        //set up the roll button
         Button roll = new Button("Roll dice");
         roll.setLayoutX(490);
         roll.setLayoutY(150+60*4+20);
         roll.setOnMousePressed(e -> {
             board.getChildren().remove(roll);
+
+            //show four dice rolling gif, representing four dices rolled
+            //first three are larger, representing dice A
+            //last onr is smaller, representing dice B
             ImageView imageView1 = new ImageView();
             Image diceRolling1 = new Image(Viewer.class.getResource("assets/"+"dieA.gif").toString());
             imageView1.setLayoutX(490);
             imageView1.setLayoutY(150);
             imageView1.setFitHeight(60);
             imageView1.setFitWidth(60);
-
             Image diceRolling2 = new Image(Viewer.class.getResource("assets/"+"dieA.gif").toString());
             ImageView imageView2 = new ImageView();
             imageView2.setLayoutX(490);
             imageView2.setLayoutY(150+60);
             imageView2.setFitHeight(60);
             imageView2.setFitWidth(60);
-
             Image diceRolling3 = new Image(Viewer.class.getResource("assets/"+"dieA.gif").toString());
             ImageView imageView3 = new ImageView();
             imageView3.setLayoutX(490);
             imageView3.setLayoutY(150+60*2);
             imageView3.setFitHeight(60);
             imageView3.setFitWidth(60);
-
             Image diceRolling4 = new Image(Viewer.class.getResource("assets/"+"dieA.gif").toString());
             ImageView imageView4 = new ImageView();
             imageView4.setLayoutX(490+5);
             imageView4.setLayoutY(150+60*3+5);
             imageView4.setFitHeight(50);
             imageView4.setFitWidth(50);
-
             Timeline timeline = new Timeline( new KeyFrame(Duration.ZERO, event -> {
                 imageView1.setImage(diceRolling1);
                 imageView2.setImage(diceRolling2);
@@ -168,10 +161,12 @@ public class MultiplePlayers extends Viewer{
                 imageView4.setImage(diceRolling4);
             }),new KeyFrame(Duration.millis(1800)));
             board.getChildren().addAll(imageView1,imageView2,imageView3,imageView4);
-
             timeline.play();
             timeline.setOnFinished(actionEvent -> {
                 board.getChildren().removeAll(imageView1,imageView2,imageView3,imageView4);
+
+                //set up the draggable tiles and simple tiles
+                //simple tiles are mainly used to replace locked tiles
                 firstNormal = new DraggableTile(diceResult.substring(0,2),495,155);
                 secondNormal = new DraggableTile(diceResult.substring(2,4),495,155+60);
                 thirdNormal = new DraggableTile(diceResult.substring(4,6),495,155+60*2);
@@ -183,6 +178,8 @@ public class MultiplePlayers extends Viewer{
                 normals.getChildren().addAll(firstNormal,secondNormal,thirdNormal,fourthNormal);
                 normalImages.getChildren().addAll(firstImage,secondImage,thirdImage,fourthImage);
 
+                // make computer's placements
+                //check whether used special tiles
                 int len = compSqu.length()/5;
                 for(int i = 0; i<len; i++){
                     String compPlacement = compSqu.substring(i*5,i*5+5);
@@ -201,27 +198,31 @@ public class MultiplePlayers extends Viewer{
                     }
                 }
 
+                //set up the button to use special tiles
                 useSpecial = new Button("Use special tile");
                 useSpecial.setLayoutX(475);
                 useSpecial.setLayoutY(150+60*4+80);
                 useSpecial.setOnMousePressed(event -> {
-                    board.getChildren().remove(useSpecial);
-                    board.getChildren().remove(tileUsing);
+                    board.getChildren().remove(useSpecial);  //special tile can only use once a time
+                    board.getChildren().remove(tileUsing);  //a special tile replace a normal tile
                     tileUsing =null;
-                    specials.getChildren().remove(specialImages);
+                    specials.getChildren().remove(specialImages); //unlock the special tiles
                     specials.getChildren().add(specialTiles);
                 });
 
+                //set on make placement button
                 Button make = new Button("make one placement");
                 make.setLayoutX(475);
                 make.setLayoutY(150+60*4+30);
                 make.setOnMousePressed(event -> {
                     if(tileUsing!=null || specialUsing!=null){
                         String placement="";
-                        if(specialUsing==null){
+                        if(specialUsing==null){ //means placed a normal tile
                             placement = tileUsing.getPlacementString();
+                            //check validity
                             if(RailroadInk.isValidPlacementSequence(boardStringPlayer+placement) && RailroadInk.isBoardStringWellFormed(boardStringPlayer+placement)){
                                 boardStringPlayer=boardStringPlayer+placement;
+                                //reset all the temporary thing
                                 currentScorePlayer.setText("Basic score : "+RailroadInk.getBasicScore(boardStringPlayer));
                                 normals.getChildren().remove(tileUsing);
                                 board.getChildren().add(new Tile(tileUsing.tileName, tileUsing.getLayoutX(), tileUsing.getLayoutY(), tileUsing.rotate));
@@ -230,15 +231,15 @@ public class MultiplePlayers extends Viewer{
                                 tileUsing =null;
                                 board.getChildren().remove(normalImages);
                                 board.getChildren().remove(useSpecial);
-                                if(countDice<3){
+                                if(countDice<3){ //during a round
                                     board.getChildren().add(normals);
                                     countDice++;
-                                }else {
+                                }else {  //end a round
                                     countDice=0;
                                     board.getChildren().remove(make);
                                     if(countRound<7){
                                         board.getChildren().add(roll);
-                                    }else if (countRound==7 && countDice<3){
+                                    }else if (countRound==7 && countDice<3){ //in the last round, but not last tile
                                         board.getChildren().add(roll);
                                     }
                                     nextRound();
@@ -246,10 +247,12 @@ public class MultiplePlayers extends Viewer{
                             }else {
                                 tileUsing.alertError();
                             }
-                        }else {
+                        }else {  //placed a special tile
                             placement = specialUsing.getPlacementString();
+                            //check validity
                             if(RailroadInk.isValidPlacementSequence(boardStringPlayer+placement)&& RailroadInk.isBoardStringWellFormed(boardStringPlayer+placement)){
                                 boardStringPlayer=boardStringPlayer+placement;
+                                //reset everything related and temporary
                                 currentScorePlayer.setText("Basic score : "+RailroadInk.getBasicScore(boardStringPlayer));
                                 board.getChildren().add(new Tile(specialUsing.tileName,specialUsing.getLayoutX(),specialUsing.getLayoutY(),specialUsing.rotate));
                                 specials.getChildren().remove(specialUsing);
@@ -258,15 +261,15 @@ public class MultiplePlayers extends Viewer{
                                 board.getChildren().add(normals);
                                 board.getChildren().remove(normalImages);
                                 board.getChildren().remove(useSpecial);
-                                if(countDice<3){
+                                if(countDice<3){ //during a round
                                     countDice++;
-                                }else {
+                                }else { //ending a round
                                     if(countRound<7){
                                         board.getChildren().add(roll);
-                                    }else if (countRound==7 && countDice<3){
+                                    }else if (countRound==7 && countDice<3){  //last round but not last tile
                                         board.getChildren().add(roll);
                                     }
-                                    board.getChildren().remove(make);
+                                    board.getChildren().remove(make); //make placement button should show up after dices rolled
                                     countDice=0;
                                     nextRound();
                                 }
@@ -274,7 +277,7 @@ public class MultiplePlayers extends Viewer{
                                 specialUsing.alertError();
                             }
                         }
-                    }else {
+                    }else { //did not place anything
                         Alert alert = new Alert(Alert.AlertType.INFORMATION);
                         alert.setHeaderText("Cannot find new placement");
                         alert.showAndWait();
@@ -287,9 +290,12 @@ public class MultiplePlayers extends Viewer{
         board.getChildren().add(roll);
     }
 
+    //to finish a game
     private static void finishGame(){
         int playerScore = RailroadInk.getBasicScore(boardStringPlayer);
         int compScore = RailroadInk.getBasicScore(boardStringComp);
+
+        //set up animation according to the scores of player and computer
         Image image;
         if(playerScore>compScore){
             image = new Image(Viewer.class.getResource(URI_BASE+"win.png").toString());
@@ -312,6 +318,7 @@ public class MultiplePlayers extends Viewer{
         timeline.play();
         board.getChildren().add(imageView);
 
+        //set text for scoring, after animation, player can still see the scores
         Text a = new Text();
         a.setText(yourName+" : "+playerScore);
         a.setLayoutX(490);
@@ -321,11 +328,12 @@ public class MultiplePlayers extends Viewer{
         b.setLayoutX(490);
         b.setLayoutY(490);
         board.getChildren().addAll(a,b);
-
-
     }
 
-    private static void initBoard(){   //棋盘和 back按钮  还有出口
+    //initialize the board
+    private static void initBoard(){
+
+        //initialize two 7*7 grids
         for(int i=0; i<7; i++){
             for(int m=0; m<7; m++){
                 grids.getChildren().add(new Grid(70+i*50,100+m*50,50));
@@ -338,6 +346,7 @@ public class MultiplePlayers extends Viewer{
         }
         board.getChildren().add(grids);
 
+        //initialize the scores remainder button
         currentScorePlayer= new Text("Basic Score : " +basicScorePlayer);
         currentScoreComp=new Text("Basic Score : "+basicScoreComp);
         currentScorePlayer.setLayoutX(270);
@@ -346,6 +355,7 @@ public class MultiplePlayers extends Viewer{
         currentScoreComp.setLayoutY(50);
         board.getChildren().addAll(currentScorePlayer,currentScoreComp);
 
+        //initialize exits
         Tile a1  = new Tile("HighExit",70-50,150+50*2,270);
         Tile a2  = new Tile("HighExit",620-50,150+50*2,270);
         Tile b1  = new Tile("HighExit",70+50*7,150+50*2,90);
@@ -372,7 +382,8 @@ public class MultiplePlayers extends Viewer{
         Tile l2 = new Tile("RailExit",620+50*3,150+50*6,180);
         grids.getChildren().addAll(a1,a2,b1,b2,c1,c2,d1,d2,e1,e2,f1,f2,g1,g2,h1,h2,i1,i2,j1,j2,k1,k2,l1,l2);
 
-        Rectangle diceFrame1 = new Rectangle();    //建一个骰子的框框
+        //initialize the frame of dices
+        Rectangle diceFrame1 = new Rectangle();
         diceFrame1.setX(490);
         diceFrame1.setY(150);
         diceFrame1.setWidth(60);
@@ -412,11 +423,12 @@ public class MultiplePlayers extends Viewer{
         diceFrame4.setStrokeWidth(5);
         board.getChildren().add(diceFrame4);
 
-
+        //initialize the back button
         Button back = new Button("Back");
         back.setLayoutX(10);
         back.setLayoutY(10);
-        back.setOnMousePressed(e -> {    //所有group都要清空， 数字string都要还原
+        back.setOnMousePressed(e -> {
+            //clear all groups, reset all values
             rootMul.getChildren().clear();
             board.getChildren().clear();
             grids.getChildren().clear();
@@ -458,15 +470,14 @@ public class MultiplePlayers extends Viewer{
             useSpecial=null;
             currentScorePlayer=null;
             currentScoreComp=null;
-
             root.getChildren().remove(rootMul);
             root.getChildren().add(begin);
         });
         board.getChildren().add(back);
-
         rootMul.getChildren().add(board);
     }
 
+    //at the beginning of a game, ask the name of player
     private static void askPlayerName(){
         TextInputDialog dialog = new TextInputDialog();
         dialog.setHeaderText("Welcome to Battle Mode ! ");
@@ -477,6 +488,7 @@ public class MultiplePlayers extends Viewer{
         }
     }
 
+    //show the name and score of player and computer
     private static void nameAndScore(){
         Text name1 = new Text();
         Text name2 = new Text();
@@ -489,6 +501,7 @@ public class MultiplePlayers extends Viewer{
         grids.getChildren().addAll(name1,name2);
     }
 
+    //initialize the special tiles
     public static void initSpecial(){
         for(int i = 0; i<6; i++){
             String tileName = "S"+i;
@@ -508,14 +521,9 @@ public class MultiplePlayers extends Viewer{
     }
 
 
-
-    // -----分界线----------
-    //后面的都要改
-
     static class Tile extends ImageView {
         double x,y;
         String tileName;
-        MultiplePlayers multiplePlayers;
         int rotate;
         Tile(String tileName, double x, double y){
             this.x = x;
@@ -528,13 +536,13 @@ public class MultiplePlayers extends Viewer{
             this.setLayoutY(y);
             this.toFront();
 
-            this.setOnMousePressed(e -> {
+            this.setOnMousePressed(e -> { // Tile cannot be dragged, when player tried to, alert him/her
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setHeaderText("This tile is locked!");
                 alert.showAndWait();
             });
         }
-        Tile(String tileName, double x, double y,int rotate){
+        Tile(String tileName, double x, double y,int rotate){ //add a rotate parameter, useful when make placements according to placementString
             this.x = x;
             this.y = y;
             this.tileName=tileName;
@@ -563,15 +571,6 @@ public class MultiplePlayers extends Viewer{
         String gridName = "__";
         private double oriX = -1;
         private double oriY = -1;
-
-        void recordOriginalLocation(){
-            if(oriX<0){
-                oriX=this.x;
-            }
-            if(oriY<0){
-                oriY=this.y;
-            }
-        }
 
         DraggableTile(String tileName, double x, double y){
             super(tileName,x,y);
@@ -632,8 +631,37 @@ public class MultiplePlayers extends Viewer{
                 lockOthers();
             });
         }
+
+        String getPlacementString(){
+            return tileName+gridName+rotate/90;
+        }
+
+        void rotate(){
+            rotate=rotate+90;
+            if(rotate<=270){
+                this.setRotate(rotate);
+            }else if(rotate<=630){
+                this.setRotate(0);
+                this.setScaleX(-1);
+                this.setRotate(rotate-360);
+            }else {
+                rotate=0;
+                this.setRotate(rotate);
+                this.setScaleX(1);
+            }
+        }
+
+        void recordOriginalLocation(){
+            if(oriX<0){
+                oriX=this.x;
+            }
+            if(oriY<0){
+                oriY=this.y;
+            }
+        }
+
         void lockOthers(){
-            if(this.tileName.substring(0,1).equals("S")){
+            if(this.tileName.substring(0,1).equals("S")){ //for special tiles
                if(specialUsing==null){
                    board.getChildren().remove(useSpecial);
                    switch (this.tileName.charAt(1)){
@@ -661,7 +689,7 @@ public class MultiplePlayers extends Viewer{
                    specials.getChildren().add(specialImages);
                    specials.getChildren().add(specialUsing);
                }
-            }else {
+            }else { //for normal tiles
                 if(tileUsing==null){
                     board.getChildren().remove(normals);
                     tileUsing = this;
@@ -673,32 +701,7 @@ public class MultiplePlayers extends Viewer{
                         }
                     }
                     board.getChildren().add(normalImages);
-                    /*
-                    cover.getChildren().add(new Grid(this.oriX-3,this.oriY-3,55));
-                    for(DraggableTile d:usedTiles){
-                        cover.getChildren().add(new Grid(d.oriX-3,d.oriY-3,55));
-                    }
-                     */
                 }
-            }
-        }
-
-        String getPlacementString(){
-            return tileName+gridName+rotate/90;
-        }
-
-        void rotate(){
-            rotate=rotate+90;
-            if(rotate<=270){
-                this.setRotate(rotate);
-            }else if(rotate<=630){
-                this.setRotate(0);
-                this.setScaleX(-1);
-                this.setRotate(rotate-360);
-            }else {
-                rotate=0;
-                this.setRotate(rotate);
-                this.setScaleX(1);
             }
         }
 
@@ -731,18 +734,9 @@ public class MultiplePlayers extends Viewer{
             alert.getChildren().addAll(up,down,left,right);
             board.getChildren().add(alert);
         }
-
-        void backToOrigin(){  //can only use on special tiles
-            int i = Integer.parseInt(this.tileName.substring(1,2));
-            this.setLayoutX(70+i*60);
-            this.setLayoutY(530);
-            this.setRotate(0);
-            this.setScaleX(1);
-            //specialMoved=null;
-        }
-
     }
 
+    //return a HashMap, grid strings as keys, x and y coordination as values
     static HashMap<String,int[]> theBoardGrid(){
         HashMap<String,int[]> locations = new HashMap<>();
         int[][] locationValue = gridLocation();
@@ -753,6 +747,7 @@ public class MultiplePlayers extends Viewer{
         return locations;
     }
 
+    //return the coordinate of the nearest grid
     static double[] nearestGrid(double x, double y){
         double[] nearest = new double[2];
         double min = 50*50*2;
@@ -772,6 +767,7 @@ public class MultiplePlayers extends Viewer{
         return nearest;
     }
 
+    //get all grids' location
     static int[][] gridLocation(){
         int[][] list = new int[49][2];
         int count = 0;
@@ -785,6 +781,7 @@ public class MultiplePlayers extends Viewer{
         return list;
     }
 
+    //a class helps to create boards
     static class Grid extends Rectangle {
         double x,y;
         double size;
