@@ -243,12 +243,11 @@ public class RailroadInk {
      * @return a String representing the die roll e.g. A0A4A3B2
      */
     public static String generateDiceRoll() {
-        int result, result1, result2, result3 = 0;
         Random r = new Random();
-        result = r.nextInt(6);
-        result1 = r.nextInt(6);
-        result2 = r.nextInt(6);
-        result3 = r.nextInt(3);
+        int result = r.nextInt(6);
+        int result1 = r.nextInt(6);
+        int result2 = r.nextInt(6);
+        int result3 = r.nextInt(3);
         String dice = "A" + Integer.toString(result) + "A" +  Integer.toString(result1) + "A" +  Integer.toString(result2) +"B" + Integer.toString(result3);
         return dice;
     }
@@ -278,8 +277,22 @@ public class RailroadInk {
      * @see RailroadInk#generateDiceRoll()
      */
     public static String generateMove(String boardString, String diceRoll) {
-        String place = "";
         String moves = "";
+
+        for (int i = 0; i <diceRoll.length(); i += 2){
+            String move = generateAMove(boardString,diceRoll.substring(i,i+2));
+            if (move != ""){
+            System.out.println(move);
+            moves += move;
+            boardString += move;
+            System.out.println(boardString);}
+        }
+
+        return moves;
+    }
+
+    private static String generateAMove (String boardString, String diceRoll){
+        String place = "";
         String[] a = {"A", "B", "C", "D", "E", "F", "G" };
         String[] b = {"0", "1", "2", "3", "4", "5", "6" };
         String[] c = {"0", "1", "2", "3", "4", "5", "6", "7" };
@@ -287,16 +300,12 @@ public class RailroadInk {
             for (int y = 0; y<7; y++){
                 for (int z = 0; z<8; z++){ place += a[x] + b[y] + c[z]; }}}
 
-        for (int i = 0; i < 8; i = i+2){
-            for (int j = 0; j<place.length(); j += 3){
-                String move = diceRoll.substring(i,i+2) + place.substring(j,j+3);
-                if(isValidPlacementSequence(boardString + move)  && !Board.isOverlap(move ,boardString)){
-                    boardString += boardString + move;
-                    moves += move ;
-                    break;}
-            }}
+        for (int j = 0; j<place.length(); j += 3){
+            String move = diceRoll+ place.substring(j,j+3);
+            if(isValidPlacementSequence((boardString + move))){
+                return move;}}
 
-        return moves;
+        return "";
     }
 
     /**
@@ -312,6 +321,13 @@ public class RailroadInk {
     public static int getAdvancedScore(String boardString) {
         // FIXME Task 12: compute the total score including bonus points
         return -1;
+    }
+
+    public static void main(String[] args) {
+        String a = "A0F00A0B00A0A30B1A10A0B61A0F61A0G32B1D61A0G43A0A62A0E61B1G56S1G60S5A20A0E03A0A03B1G12A0G02S0A50A0B50A0B41B1A41";
+        String b = "A0A0A0B1";
+        System.out.println(b + null);
+        System.out.println(generateMove(a,b ));
     }
 
 
